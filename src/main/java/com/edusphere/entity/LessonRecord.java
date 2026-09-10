@@ -25,7 +25,7 @@ public class LessonRecord {
     private Topic topic;
 
     @Column
-    private int grade;
+    private Integer grade;
 
     @Column
     private boolean absent;
@@ -81,7 +81,7 @@ public class LessonRecord {
     }
 
     public void markAbsent() {
-        this.grade = Integer.parseInt(null);
+        this.grade = null;
         this.absent = true;
     }
 
@@ -130,6 +130,10 @@ public class LessonRecord {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public Teacher getJustifiedBy() {
+        return justifiedBy;
     }
 }
 

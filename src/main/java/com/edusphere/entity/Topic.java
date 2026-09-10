@@ -1,8 +1,6 @@
 package com.edusphere.entity;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.ManyToAny;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -48,9 +46,6 @@ public class Topic {
         return teachingAssignment;
     }
 
-    public void setTeachingAssignment(TeachingAssignment teachingAssignment) {
-        this.teachingAssignment = teachingAssignment;
-    }
 
     public LocalDate getDate() {
         return date;
@@ -78,10 +73,6 @@ public class Topic {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
     }
 }
 
