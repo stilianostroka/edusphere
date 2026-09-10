@@ -22,7 +22,7 @@ public class Teacher {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "gender",nullable = false)
-    private String gender;
+    private Gender gender;
 
     public Teacher() {
     }

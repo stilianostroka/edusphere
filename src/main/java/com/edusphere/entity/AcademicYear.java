@@ -12,7 +12,7 @@ public class AcademicYear {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, name = "academic_year")
+    @Column(nullable = false,unique = true, name = "academic_year")
     private String academicYear;
 
     @Column(nullable = false, name = "start_date")
@@ -33,7 +33,7 @@ public class AcademicYear {
         this.active = active;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 

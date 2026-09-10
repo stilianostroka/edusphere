@@ -22,7 +22,7 @@ public class Parent {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String gender;
+    private Gender gender;
 
     @Column
     private String address;

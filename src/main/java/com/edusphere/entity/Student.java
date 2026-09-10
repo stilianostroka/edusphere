@@ -30,7 +30,7 @@ public class Student {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "gender",nullable = false)
-    private String gender;
+    private Gender gender;
 
     @Column(name = "personal_id",nullable = false)
     private String personalId;
@@ -60,7 +60,7 @@ public class Student {
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
         this.personalId = personalId;
-        this.enrollmentDate = enrollmentDate;
+        this.enrollmentDate = LocalDate.now();
         this.status = StudentStatus.ACTIVE;
     }
 
