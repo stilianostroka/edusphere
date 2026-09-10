@@ -32,7 +32,7 @@ public class Student {
     @Column(name = "gender",nullable = false)
     private Gender gender;
 
-    @Column(name = "personal_id",nullable = false)
+    @Column(name = "personal_id",nullable = false, unique = true)
     private String personalId;
 
     @Column(name = "enrollment_date", nullable = false)
@@ -118,6 +118,42 @@ public class Student {
 
     public void removeParent(Parent parent){
         parents.remove(parent);
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    public LocalDate getEnrollmentDate() {
+        return enrollmentDate;
+    }
+
+    public void setEnrollmentDate(LocalDate enrollmentDate) {
+        this.enrollmentDate = enrollmentDate;
+    }
+
+    public StudentStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(StudentStatus status) {
+        this.status = status;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public void setParents(Set<Parent> parents) {
+        this.parents = parents;
     }
 }
 

@@ -13,7 +13,7 @@ public class AcademicYear {
     private Long id;
 
     @Column(nullable = false,unique = true, name = "academic_year")
-    private String academicYear;
+    private String label;
 
     @Column(nullable = false, name = "start_date")
     private LocalDate startDate;
@@ -27,7 +27,7 @@ public class AcademicYear {
     public AcademicYear() {
     }
     public AcademicYear(String academicYear, LocalDate startDate, LocalDate endDate, boolean active) {
-        this.academicYear = academicYear;
+        this.label = academicYear;
         this.startDate = startDate;
         this.endDate = endDate;
         this.active = active;
@@ -38,11 +38,11 @@ public class AcademicYear {
     }
 
     public String getAcademicYear() {
-        return academicYear;
+        return label;
     }
 
     public void setAcademicYear(String academicYear) {
-        this.academicYear = academicYear;
+        this.label = academicYear;
     }
 
     public LocalDate getStartDate() {

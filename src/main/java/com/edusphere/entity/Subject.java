@@ -19,7 +19,11 @@ public class Subject {
     @Column(nullable = false, name = "total_hours")
     private int totalHours;
 
-    public Subject(int totalHours, String subjectName, String code) {
+    @Column(name = "program_year", nullable = false)
+    private Integer programYear;
+
+    public Subject(int totalHours, String subjectName, String code, Integer programYear) {
+        this.programYear = programYear;
         this.totalHours = totalHours;
         this.subjectName = subjectName;
         this.code = code;
@@ -44,6 +48,10 @@ public class Subject {
         return totalHours;
     }
 
+    public Integer getProgramYear() {
+        return programYear;
+    }
+
     public void setCode(String code) {
         this.code = code;
     }
@@ -54,6 +62,10 @@ public class Subject {
 
     public void setTotalHours(int totalHours) {
         this.totalHours = totalHours;
+    }
+
+    public void setProgramYear(Integer programYear){
+        this.programYear = programYear;
     }
 }
 
