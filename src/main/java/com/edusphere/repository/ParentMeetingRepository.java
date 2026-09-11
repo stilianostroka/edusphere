@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface ParentMeetingRepository extends JpaRepository<ParentMeeting, Long> {
     List<ParentMeeting> findAllBySchoolClass(SchoolClass schoolClass);
+    boolean existsByTopicsDiscussed(String topicsDiscussed);
 }

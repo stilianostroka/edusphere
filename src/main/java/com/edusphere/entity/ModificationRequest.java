@@ -109,14 +109,20 @@ public class ModificationRequest {
         return new ModificationRequest(requestedBy, topic, null, null, false, proposedTopicName, proposedDescription, explanation);
     }
 
-    public void approve() {
+    public void approve(User admin) {
         requireStatus(ModificationRequestStatus.PENDING, "Only a PENDING request can be approved");
+        if (admin.getRole() != Role.ADMIN) {
+            throw new IllegalArgumentException("Only an Administrator can approve a modification request");
+        }
         this.status = ModificationRequestStatus.APPROVED;
         this.reviewedAt = LocalDateTime.now();
     }
 
-    public void reject() {
+    public void reject(User admin) {
         requireStatus(ModificationRequestStatus.PENDING, "Only a PENDING request can be rejected");
+        if (admin.getRole() != Role.ADMIN) {
+            throw new IllegalArgumentException("Only an Administrator can approve a modification request");
+        }
         this.status = ModificationRequestStatus.REJECTED;
         this.reviewedAt = LocalDateTime.now();
     }

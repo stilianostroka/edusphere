@@ -10,17 +10,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Service
-public class TopicService {
+public class TopicService implements EditWindow {
 
     private final TopicRepository topicRepository;
     private static final int EDIT_WINDOW_HOURS = 24;
 
     public TopicService(TopicRepository topicRepository) {
         this.topicRepository = topicRepository;
-    }
-
-    private boolean isWithinEditWindow(LocalDateTime createdAt) {
-        return Duration.between(createdAt, LocalDateTime.now()).toHours() < EDIT_WINDOW_HOURS;
     }
 
     public Topic createTopic(TeachingAssignment teachingAssignment, String topicName,

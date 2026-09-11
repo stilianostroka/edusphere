@@ -9,7 +9,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "parent_meetings")
@@ -28,7 +28,7 @@ public class ParentMeeting {
     private Teacher recordedBy;
 
     @Column(name = "meeting_datetime", nullable = false)
-    private LocalDateTime meetingDateTime;
+    private LocalDate meetingDateTime;
 
     @Column(name = "topics_discussed", nullable = false)
     private String topicsDiscussed;
@@ -36,7 +36,7 @@ public class ParentMeeting {
     protected ParentMeeting() {
     }
 
-    public ParentMeeting(SchoolClass schoolClass, Teacher recordedBy, LocalDateTime meetingDateTime, String topicsDiscussed) {
+    public ParentMeeting(SchoolClass schoolClass, Teacher recordedBy, LocalDate meetingDateTime, String topicsDiscussed) {
         if (schoolClass.getSupervisorTeacher() == null || !schoolClass.getSupervisorTeacher().getId().equals(recordedBy.getId())) {
             throw new IllegalArgumentException("Only the class's supervising teacher can record a parent meeting");
         }
@@ -49,7 +49,7 @@ public class ParentMeeting {
         this.topicsDiscussed = topicsDiscussed;
     }
 
-    public void setMeetingDateTime(LocalDateTime meetingDateTime) {
+    public void setMeetingDateTime(LocalDate meetingDateTime) {
         this.meetingDateTime = meetingDateTime;
     }
 
@@ -72,7 +72,7 @@ public class ParentMeeting {
         return recordedBy;
     }
 
-    public LocalDateTime getMeetingDateTime() {
+    public LocalDate getMeetingDateTime() {
         return meetingDateTime;
     }
 

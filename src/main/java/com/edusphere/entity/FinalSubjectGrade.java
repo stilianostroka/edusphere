@@ -94,13 +94,19 @@ public class FinalSubjectGrade {
 
     public void approve(User admin) {
         requireStatus(FinalGradeStatus.SUBMITTED, "Only a SUBMITTED grade can be approved");
+        if (admin.getRole() != Role.ADMIN) {
+            throw new IllegalArgumentException("Only an Administrator can approve a final grade");
+        }
         this.status = FinalGradeStatus.APPROVED;
         this.approvedAt = LocalDateTime.now();
         this.approvedBy = admin;
     }
 
-    public void reject() {
+    public void reject(User admin) {
         requireStatus(FinalGradeStatus.SUBMITTED, "Only a SUBMITTED grade can be rejected");
+        if (admin.getRole() != Role.ADMIN) {
+            throw new IllegalArgumentException("Only an Administrator can approve a final grade");
+        }
         this.status = FinalGradeStatus.DRAFT;
         this.submittedAt = null;
         this.cceg = null;
