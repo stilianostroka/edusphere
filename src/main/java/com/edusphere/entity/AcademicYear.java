@@ -26,11 +26,10 @@ public class AcademicYear {
 
     public AcademicYear() {
     }
-    public AcademicYear(String academicYear, LocalDate startDate, LocalDate endDate, boolean active) {
+    public AcademicYear(String academicYear, LocalDate startDate, LocalDate endDate) {
         this.label = academicYear;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.active = active;
     }
 
     public Long getId() {

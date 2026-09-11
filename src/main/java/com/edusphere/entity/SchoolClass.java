@@ -3,7 +3,11 @@ package com.edusphere.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "classes")
+@Table(name = "classes", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"academic_year_id", "class_name"}),
+        @UniqueConstraint(columnNames = {"academic_year_id", "supervisor_teacher_id"})
+})
+
 public class SchoolClass {
 
     @Id
@@ -15,7 +19,7 @@ public class SchoolClass {
     private AcademicYear academicYear;
 
     @ManyToOne
-    @JoinColumn(name = "supervisor_teacher_id", nullable = false)
+    @JoinColumn(name = "supervisor_teacher_id")
     private Teacher supervisorTeacher;
 
     @Column(name = "class_name",nullable = false)
@@ -30,7 +34,7 @@ public class SchoolClass {
     public SchoolClass() {
     }
 
-    public SchoolClass(AcademicYear academicYear, Teacher supervisorTeacher, String className, String classYear, Integer maxStudents) {
+    public SchoolClass(AcademicYear academicYear, String className, String classYear, Integer maxStudents) {
         this.academicYear = academicYear;
         this.className = className;
         this.classYear = classYear;
@@ -43,10 +47,6 @@ public class SchoolClass {
 
     public AcademicYear getAcademicYear() {
         return academicYear;
-    }
-
-    public void setAcademicYear(AcademicYear academicYear) {
-        this.academicYear = academicYear;
     }
 
     public Teacher getSupervisorTeacher() {

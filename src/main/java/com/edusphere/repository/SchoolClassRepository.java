@@ -2,6 +2,7 @@ package com.edusphere.repository;
 
 import com.edusphere.entity.AcademicYear;
 import com.edusphere.entity.SchoolClass;
+import com.edusphere.entity.Teacher;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -11,6 +12,7 @@ public interface SchoolClassRepository extends JpaRepository<SchoolClass,Long> {
     List<SchoolClass> findByAcademicYear(AcademicYear academicYear);
     Optional<SchoolClass> findByAcademicYearAndClassName(AcademicYear academicYear, String className);
     boolean existsByAcademicYearAndClassName(AcademicYear academicYear, String className);
+    boolean existsByAcademicYearAndSupervisorTeacher(AcademicYear academicYear, Teacher supervisorTeacher);
 }
 
 
