@@ -4,6 +4,7 @@ import com.edusphere.entity.PasswordResetToken;
 import com.edusphere.entity.User;
 import com.edusphere.repository.PasswordResetTokenRepository;
 import com.edusphere.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -11,10 +12,12 @@ public class PasswordResetService {
 
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public PasswordResetService(PasswordResetTokenRepository passwordResetTokenRepository, UserRepository userRepository) {
+    public PasswordResetService(PasswordResetTokenRepository passwordResetTokenRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.passwordResetTokenRepository = passwordResetTokenRepository;
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public PasswordResetToken requestPasswordReset(String email) {
@@ -39,8 +42,7 @@ public class PasswordResetService {
 
         User user = resetToken.getUser();
 
-        // TODO: replace with passwordEncoder.encode(newRawPassword) once BCryptPasswordEncoder is wired up
-        user.setPasswordHash(newRawPassword);
+        user.setPasswordHash(passwordEncoder.encode(newRawPassword));
         userRepository.save(user);
     }
 }
