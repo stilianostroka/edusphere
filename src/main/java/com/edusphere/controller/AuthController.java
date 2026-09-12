@@ -1,10 +1,7 @@
 package com.edusphere.controller;
 
-import com.edusphere.security.JwtService;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
+import com.edusphere.service.AuthService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,29 +13,16 @@ import java.util.Map;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private final AuthenticationManager authenticationManager;
-    private final JwtService jwtService;
+    private final AuthService authService;
 
-    public AuthController(AuthenticationManager authenticationManager, JwtService jwtService) {
-        this.authenticationManager = authenticationManager;
-        this.jwtService = jwtService;
+    public AuthController(AuthService authService) {
+        this.authService = authService;
     }
 
     @PostMapping("/login")
-    public Map<String, String> login(@RequestBody LoginRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.email(), request.password())
-        );
-
-        String roleWithPrefix = authentication.getAuthorities().stream()
-                .findFirst()
-                .map(GrantedAuthority::getAuthority)
-                .orElseThrow();
-
-        String role = roleWithPrefix.replace("ROLE_", "");
-        String token = jwtService.generateToken(request.email(), role);
-
-        return Map.of("token", token);
+    public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest request) {
+        String token = authService.login(request.email(), request.password());
+        return ResponseEntity.ok(Map.of("token", token));
     }
 
     public record LoginRequest(String email, String password) {}
