@@ -105,7 +105,7 @@ public class FinalSubjectGrade {
     public void reject(User admin) {
         requireStatus(FinalGradeStatus.SUBMITTED, "Only a SUBMITTED grade can be rejected");
         if (admin.getRole() != Role.ADMIN) {
-            throw new IllegalArgumentException("Only an Administrator can approve a final grade");
+            throw new IllegalArgumentException("Only an Administrator can reject a final grade");
         }
         this.status = FinalGradeStatus.DRAFT;
         this.submittedAt = null;

@@ -3,12 +3,9 @@ package com.edusphere.service;
 import com.edusphere.entity.TeachingAssignment;
 import com.edusphere.entity.Topic;
 import com.edusphere.repository.TopicRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -55,7 +52,7 @@ public class TopicService implements EditWindow {
             throw new IllegalStateException("The 24-hour edit window has passed for this topic; " +
                             "submit a modification request instead");
 
-        topicRepository.delete(topicRepository.findById(topicId).get());
+        topicRepository.delete(topicRepository.findById(topicId).orElseThrow(() -> new IllegalArgumentException("No topic found with that ID.")));
     }
 }
 

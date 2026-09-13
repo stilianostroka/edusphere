@@ -25,7 +25,7 @@ public class TeachingAssignmentController {
         return ResponseEntity.ok(teachingAssignmentService.getAll().stream().map(this::toResponse).toList());
     }
 
-    @GetMapping("/{teacherId}")
+    @GetMapping("/teacber/{teacherId}")
     public ResponseEntity<List<TeachingAssignmentResponse>> getByTeacherId(@PathVariable Long teacherId){
         return ResponseEntity.ok(teachingAssignmentService.getByTeacher(teacherId).stream().map(this::toResponse).toList());
     }

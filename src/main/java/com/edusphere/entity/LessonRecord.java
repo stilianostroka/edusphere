@@ -112,7 +112,7 @@ public class LessonRecord {
         return topic;
     }
 
-    public int getGrade() {
+    public Integer getGrade() {
         return grade;
     }
 

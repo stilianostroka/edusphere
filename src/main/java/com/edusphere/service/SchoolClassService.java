@@ -53,9 +53,9 @@ public class SchoolClassService {
         AcademicYear academicYear = academicYearService.getById(schoolClass.getAcademicYear().getId());
         Teacher teacher = teacherService.getById(teacherId);
         if (schoolClassRepository.existsByAcademicYearAndSupervisorTeacher(academicYear, teacher)) {
-            throw new IllegalArgumentException("Teacher: " + teacher.getFirstName()
+            throw new IllegalArgumentException("Teacher: " + teacher.getFirstName() + " "
                     + teacher.getLastName() +
-                    "already supervises a class in this academic year!");
+                    " already supervises a class in this academic year!");
         }
         schoolClass.setSupervisorTeacher(teacher);
         schoolClassRepository.save(schoolClass);

@@ -19,10 +19,10 @@ public class UserService {
 
     public User createAnAdmin(String email, String rawPassword) {
         if (userRepository.existsByRole(Role.ADMIN))
-            throw new IllegalArgumentException("An administrator already exists.");
+            throw new IllegalStateException("An administrator already exists.");
 
         if (userRepository.existsByEmail(email))
-            throw new IllegalStateException("This email already exists.");
+            throw new IllegalArgumentException("This email already exists.");
 
         User admin = new User(email, passwordEncoder.encode(rawPassword), Role.ADMIN);
         userRepository.save(admin);

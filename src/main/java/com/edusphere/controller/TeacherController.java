@@ -45,7 +45,7 @@ public class TeacherController {
 
     private TeacherResponse toResponse(Teacher teacher) {
         return new TeacherResponse(
-                teacher.getId(), teacher.getUser().getEmail(), teacher.getFirstName(), teacher.getLastName()
+                teacher.getId(), teacher.getFirstName(), teacher.getLastName(), teacher.getUser().getEmail()
         );
     }
 }
