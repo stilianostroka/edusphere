@@ -1,11 +1,12 @@
 package com.edusphere.service;
 
+import com.edusphere.entity.Gender;
 import com.edusphere.entity.SchoolClass;
 import com.edusphere.entity.Student;
 import com.edusphere.repository.StudentRepository;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 public class StudentService {
@@ -14,6 +15,18 @@ public class StudentService {
 
     public StudentService(StudentRepository studentRepository) {
         this.studentRepository = studentRepository;
+    }
+
+    public Student getStudent(Long id){
+        return studentRepository.findById(id).orElseThrow(()-> new IllegalArgumentException("No student found with this id."));
+    }
+
+    public List<Student> getAll() {
+        return studentRepository.findAll();
+    }
+
+    public List<Student> getBySchoolClass(SchoolClass schoolClass) {
+        return studentRepository.findAllBySchoolClass(schoolClass);
     }
 
     public Student createStudent(String firstName, String lastName,
@@ -26,6 +39,23 @@ public class StudentService {
 
         studentRepository.save(student);
 
+        return student;
+    }
+
+    public Student updateStudent(Student student, String firstName, String lastName, LocalDate dateOfBirth,
+                                 String personalId, String gender, String address) {
+        if (!student.getPersonalId().equals(personalId) && studentRepository.existsByPersonalId(personalId)) {
+            throw new IllegalArgumentException("A student with personal id " + personalId + " already exists");
+        }
+
+        student.setFirstName(firstName);
+        student.setLastName(lastName);
+        student.setDateOfBirth(dateOfBirth);
+        student.setPersonalId(personalId);
+        student.setGender(Gender.valueOf(gender.toUpperCase()));
+        student.setAddress(address);
+
+        studentRepository.save(student);
         return student;
     }
 

@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AcademicYearService {
@@ -19,6 +21,27 @@ public class AcademicYearService {
                                    GradingPeriodRepository gradingPeriodRepository) {
         this.academicYearRepository = academicYearRepository;
         this.gradingPeriodRepository = gradingPeriodRepository;
+    }
+
+    public AcademicYear getById(Long id) {
+        return academicYearRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("No academic year found with id " + id));
+    }
+
+    public Optional<AcademicYear> getByLabel(String label){
+        return academicYearRepository.findByLabel(label);
+    }
+    public List<AcademicYear> getAll() {
+        return academicYearRepository.findAll();
+    }
+
+    public AcademicYear getActive(){
+        return academicYearRepository.findByActive(true)
+                .orElseThrow(() ->  new IllegalArgumentException("No active academic year currently."));
+    }
+
+    public List<GradingPeriod> getGradingPeriods(AcademicYear year) {
+        return gradingPeriodRepository.findByAcademicYear(year);
     }
 
     @Transactional
@@ -38,6 +61,25 @@ public class AcademicYearService {
 
         return academicYear;
     }
+
+    public void setCurrentYear(AcademicYear newCurrentYear) {
+        academicYearRepository.findByActive(true).ifPresent(oldCurrent -> {
+            oldCurrent.setActive(false);
+            academicYearRepository.save(oldCurrent);
+        });
+
+        newCurrentYear.setActive(true);
+        academicYearRepository.save(newCurrentYear);
+    }
+
+    public void deactivate(AcademicYear academicYear){
+        academicYearRepository.findByActive(true).ifPresent(oldCurrent ->{
+            oldCurrent.setActive(false);
+            academicYearRepository.save(oldCurrent);
+        });
+    }
+
+
 }
 
 

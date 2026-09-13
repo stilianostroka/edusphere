@@ -11,8 +11,8 @@ public class Parent {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "parent_id",nullable = false,unique = true)
-    public User user;
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    private User user;
 
     @Column(name="first_name",nullable = false)
     private String firstName;
@@ -65,6 +65,28 @@ public class Parent {
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
 }
-
-

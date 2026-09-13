@@ -9,6 +9,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class TeacherService {
 
@@ -34,6 +36,34 @@ public class TeacherService {
         teacherRepository.save(teacher);
 
         return teacher;
+    }
+
+    public Teacher updateTeacher(Long teacherId, String newEmail, String newFirstName, String newLastName) {
+        Teacher teacher = teacherRepository.findById(teacherId)
+                .orElseThrow(()-> new IllegalArgumentException("No teacher found with that ID."));
+        User user = teacher.getUser();
+
+        if (!user.getEmail().equals(newEmail) && userRepository.existsByEmail(newEmail)) {
+            throw new IllegalArgumentException("A user with email " + newEmail + " already exists");
+        }
+
+        user.setEmail(newEmail);
+        userRepository.save(user);
+
+        teacher.setFirstName(newFirstName);
+        teacher.setLastName(newLastName);
+        teacherRepository.save(teacher);
+
+        return teacher;
+    }
+
+    public Teacher getById(Long id) {
+        return teacherRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("No teacher exists with this ID."));
+    }
+
+    public List<Teacher> getAll(){
+        return teacherRepository.findAll();
     }
 }
 
