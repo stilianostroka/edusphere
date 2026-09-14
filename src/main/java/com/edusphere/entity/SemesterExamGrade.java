@@ -2,6 +2,9 @@ package com.edusphere.entity;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "semester_exam_grades",
         uniqueConstraints = @UniqueConstraint(columnNames = {"student_id", "teaching_assignment_id", "grading_period_id"}))
@@ -28,6 +31,9 @@ public class SemesterExamGrade {
 
     @Column(name = "exam_grade", nullable = false)
     private Integer examGrade;
+
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
 
     public SemesterExamGrade() {
 
@@ -69,6 +75,10 @@ public class SemesterExamGrade {
 
     public Integer getExamGrade() {
         return examGrade;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 }
 

@@ -1,27 +1,35 @@
 package com.edusphere.service;
 
-import com.edusphere.entity.Role;
-import com.edusphere.entity.TeachingAssignment;
-import com.edusphere.entity.TimetableSlot;
-import com.edusphere.entity.User;
+import com.edusphere.entity.*;
 import com.edusphere.repository.TimetableSlotRepository;
+import com.edusphere.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class TimetableService {
 
     private final TimetableSlotRepository timetableSlotRepository;
+    private final UserRepository userRepository;
+    private final TeachingAssignmentService teachingAssignmentService;
+    private final TeacherService teacherService;
 
-    public TimetableService(TimetableSlotRepository timetableSlotRepository) {
+    public TimetableService(TimetableSlotRepository timetableSlotRepository, UserRepository userRepository, TeachingAssignmentService teachingAssignmentService, TeacherService teacherService) {
         this.timetableSlotRepository = timetableSlotRepository;
+        this.userRepository = userRepository;
+        this.teachingAssignmentService = teachingAssignmentService;
+        this.teacherService = teacherService;
     }
 
-    public TimetableSlot createTimeSlot(User user, TeachingAssignment teachingAssignment, DayOfWeek dayOfWeek,
+    public TimetableSlot createTimeSlot(Long userId, Long teachingAssignmentId, DayOfWeek dayOfWeek,
                                         LocalTime startTime, LocalTime endTime){
+        User user  = userRepository.findById(userId)
+                .orElseThrow(()-> new IllegalArgumentException("No user found with this id."));
+        TeachingAssignment teachingAssignment = teachingAssignmentService.getById(teachingAssignmentId);
 
         if (user.getRole() != Role.ADMIN) {
             throw new IllegalArgumentException("Only an Administrator can create a timetable slot");
@@ -44,8 +52,12 @@ public class TimetableService {
         return slot;
     }
 
-    public TimetableSlot rescheduleSlot(User user, TimetableSlot slot, DayOfWeek newDayOfWeek,
+    public TimetableSlot rescheduleSlot(Long userId, Long slotId, DayOfWeek newDayOfWeek,
                                         LocalTime newStartTime, LocalTime newEndTime) {
+        User user  = userRepository.findById(userId)
+                .orElseThrow(()-> new IllegalArgumentException("No user found with this id."));
+
+        TimetableSlot slot = timetableSlotRepository.getById(slotId);
         if (user.getRole() != Role.ADMIN) {
             throw new IllegalArgumentException("Only an Administrator can reschedule a timetable slot");
         }
@@ -71,6 +83,20 @@ public class TimetableService {
         slot.reschedule(newDayOfWeek, newStartTime, newEndTime);
         timetableSlotRepository.save(slot);
         return slot;
+    }
+
+    public List<TimetableSlot> getByTeachingAssignment(Long teachingAssignmentId){
+        TeachingAssignment teachingAssignment = teachingAssignmentService.getById(teachingAssignmentId);
+        return timetableSlotRepository.findAllByTeachingAssignment(teachingAssignment);
+    }
+
+    public List<TimetableSlot> getByTeacher(Long teacherId) {
+        List<TeachingAssignment> assignments = teachingAssignmentService.getByTeacher(teacherId);
+        List<TimetableSlot> slots = new ArrayList<>();
+        for (TeachingAssignment assignment : assignments) {
+            slots.addAll(timetableSlotRepository.findAllByTeachingAssignment(assignment));
+        }
+        return slots;
     }
 }
 

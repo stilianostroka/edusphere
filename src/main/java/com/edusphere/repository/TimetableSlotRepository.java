@@ -33,4 +33,5 @@ public interface TimetableSlotRepository extends JpaRepository<TimetableSlot, Lo
                                                      @Param("dayOfWeek") DayOfWeek dayOfWeek,
                                                      @Param("startTime") LocalTime startTime,
                                                      @Param("endTime") LocalTime endTime);
+    List<TimetableSlot> findAllBy
 }

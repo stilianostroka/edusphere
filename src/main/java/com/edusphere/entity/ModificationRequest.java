@@ -36,6 +36,10 @@ public class ModificationRequest {
     @JoinColumn(name = "lesson_record_id")
     private LessonRecord lessonRecord;
 
+    @ManyToOne
+    @JoinColumn(name = "semester_exam_grade_id")
+    private SemesterExamGrade semesterExamGrade;
+
     @Column(name = "proposed_grade")
     private Integer proposedGrade;
 
@@ -47,6 +51,9 @@ public class ModificationRequest {
 
     @Column(name = "proposed_description")
     private String proposedDescription;
+
+    @Column(name = "proposed_exam_grade")
+    private Integer proposedExamGrade;
 
     @Column(nullable = false)
     private String explanation;
@@ -68,10 +75,12 @@ public class ModificationRequest {
             Teacher requestedBy,
             Topic topic,
             LessonRecord lessonRecord,
+            SemesterExamGrade semesterExamGrade,
             Integer proposedGrade,
             boolean proposedAbsent,
             String proposedTopicName,
             String proposedDescription,
+            Integer proposedExamGrade,
             String explanation
     ) {
         if (explanation == null || explanation.isBlank()) {
@@ -80,10 +89,12 @@ public class ModificationRequest {
         this.requestedBy = requestedBy;
         this.topic = topic;
         this.lessonRecord = lessonRecord;
+        this.semesterExamGrade = semesterExamGrade;
         this.proposedGrade = proposedGrade;
         this.proposedAbsent = proposedAbsent;
         this.proposedTopicName = proposedTopicName;
         this.proposedDescription = proposedDescription;
+        this.proposedExamGrade = proposedExamGrade;
         this.explanation = explanation;
         this.status = ModificationRequestStatus.PENDING;
         this.createdAt = LocalDateTime.now();
@@ -93,11 +104,11 @@ public class ModificationRequest {
         if (proposedGrade == null || proposedGrade < MIN_GRADE || proposedGrade > MAX_GRADE) {
             throw new IllegalArgumentException("Grade must be between " + MIN_GRADE + " and " + MAX_GRADE);
         }
-        return new ModificationRequest(requestedBy, null, lessonRecord, proposedGrade, false, null, null, explanation);
+        return new ModificationRequest(requestedBy, null, lessonRecord, null, proposedGrade, false, null, null, null, explanation);
     }
 
     public static ModificationRequest proposeAbsenceChange(Teacher requestedBy, LessonRecord lessonRecord, String explanation) {
-        return new ModificationRequest(requestedBy, null, lessonRecord, null, true, null, null, explanation);
+        return new ModificationRequest(requestedBy, null, lessonRecord, null, null, true, null, null, null, explanation);
     }
 
     public static ModificationRequest proposeTopicChange(Teacher requestedBy, Topic topic, String proposedTopicName, String proposedDescription, String explanation) {
@@ -106,7 +117,14 @@ public class ModificationRequest {
         if (!hasName && !hasDescription) {
             throw new IllegalArgumentException("Must propose a new topic name or description");
         }
-        return new ModificationRequest(requestedBy, topic, null, null, false, proposedTopicName, proposedDescription, explanation);
+        return new ModificationRequest(requestedBy, topic, null, null, null, false, proposedTopicName, proposedDescription, null, explanation);
+    }
+
+    public static ModificationRequest proposeExamGradeChange(Teacher requestedBy, SemesterExamGrade semesterExamGrade, Integer proposedExamGrade, String explanation) {
+        if (proposedExamGrade == null || proposedExamGrade < MIN_GRADE || proposedExamGrade > MAX_GRADE) {
+            throw new IllegalArgumentException("Grade must be between " + MIN_GRADE + " and " + MAX_GRADE);
+        }
+        return new ModificationRequest(requestedBy, null, null, semesterExamGrade, null, false, null, null, proposedExamGrade, explanation);
     }
 
     public void approve(User admin) {
@@ -121,7 +139,7 @@ public class ModificationRequest {
     public void reject(User admin) {
         requireStatus(ModificationRequestStatus.PENDING, "Only a PENDING request can be rejected");
         if (admin.getRole() != Role.ADMIN) {
-            throw new IllegalArgumentException("Only an Administrator can approve a modification request");
+            throw new IllegalArgumentException("Only an Administrator can reject a modification request");
         }
         this.status = ModificationRequestStatus.REJECTED;
         this.reviewedAt = LocalDateTime.now();
@@ -141,6 +159,10 @@ public class ModificationRequest {
         return lessonRecord != null;
     }
 
+    public boolean isForExamGrade() {
+        return semesterExamGrade != null;
+    }
+
     public Long getId() {
         return id;
     }
@@ -157,6 +179,10 @@ public class ModificationRequest {
         return lessonRecord;
     }
 
+    public SemesterExamGrade getSemesterExamGrade() {
+        return semesterExamGrade;
+    }
+
     public Integer getProposedGrade() {
         return proposedGrade;
     }
@@ -171,6 +197,10 @@ public class ModificationRequest {
 
     public String getProposedDescription() {
         return proposedDescription;
+    }
+
+    public Integer getProposedExamGrade() {
+        return proposedExamGrade;
     }
 
     public String getExplanation() {

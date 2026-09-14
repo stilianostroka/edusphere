@@ -17,6 +17,9 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    public User findById(Long id){
+        return userRepository.findById(id).orElseThrow(()-> new IllegalArgumentException("No user found with this id."));
+    }
     public User createAnAdmin(String email, String rawPassword) {
         if (userRepository.existsByRole(Role.ADMIN))
             throw new IllegalStateException("An administrator already exists.");
