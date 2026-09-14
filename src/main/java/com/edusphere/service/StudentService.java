@@ -3,6 +3,8 @@ package com.edusphere.service;
 import com.edusphere.entity.Gender;
 import com.edusphere.entity.SchoolClass;
 import com.edusphere.entity.Student;
+import com.edusphere.entity.StudentStatus;
+import com.edusphere.repository.SchoolClassRepository;
 import com.edusphere.repository.StudentRepository;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
@@ -12,9 +14,13 @@ import java.util.List;
 public class StudentService {
 
     private final StudentRepository studentRepository;
+    private final SchoolClassRepository schoolClassRepository;
+    private final SchoolClassService schoolClassService;
 
-    public StudentService(StudentRepository studentRepository) {
+    public StudentService(StudentRepository studentRepository, SchoolClassRepository schoolClassRepository, SchoolClassService schoolClassService) {
         this.studentRepository = studentRepository;
+        this.schoolClassRepository = schoolClassRepository;
+        this.schoolClassService = schoolClassService;
     }
 
     public Student getStudent(Long id){
@@ -42,8 +48,11 @@ public class StudentService {
         return student;
     }
 
-    public Student updateStudent(Student student, String firstName, String lastName, LocalDate dateOfBirth,
+    public Student updateStudent(Long studentId, String firstName, String lastName, LocalDate dateOfBirth,
                                  String personalId, String gender, String address) {
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(()-> new IllegalArgumentException("No student found with this ID."));
+
         if (!student.getPersonalId().equals(personalId) && studentRepository.existsByPersonalId(personalId)) {
             throw new IllegalArgumentException("A student with personal id " + personalId + " already exists");
         }
@@ -59,7 +68,11 @@ public class StudentService {
         return student;
     }
 
-    public Student enrollInClass(Student student, SchoolClass schoolClass){
+    public Student enrollInClass(Long studentId, Long schoolClassId){
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(()-> new IllegalArgumentException("No student found with this ID."));
+        SchoolClass schoolClass = schoolClassService.getById(studentId);
+
         if (student.getSchoolClass() != null && student.getSchoolClass().getId().equals(schoolClass.getId())) {
             throw new IllegalArgumentException("This student is already enrolled in this class!");
         }
@@ -71,6 +84,14 @@ public class StudentService {
         student.setSchoolClass(schoolClass);
         studentRepository.save(student);
         return student;
+    }
+
+    public void updateStatus(Long studentId, String status){
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(()-> new IllegalArgumentException("No student found with this ID."));
+
+        student.setStatus(StudentStatus.valueOf(status.toUpperCase()));
+        studentRepository.save(student);
     }
 }
 

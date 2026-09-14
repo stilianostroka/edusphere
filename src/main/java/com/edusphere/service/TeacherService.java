@@ -1,5 +1,6 @@
 package com.edusphere.service;
 
+import com.edusphere.entity.Gender;
 import com.edusphere.entity.Role;
 import com.edusphere.entity.Teacher;
 import com.edusphere.entity.User;
@@ -25,14 +26,15 @@ public class TeacherService {
     }
 
     @Transactional
-    public Teacher createTeacher(String email, String rawPassword, String firstName, String lastName){
+    public Teacher createTeacher(String email, String rawPassword, String firstName, String lastName, String gender){
         if(userRepository.existsByEmail(email))
             throw new IllegalArgumentException("A user with email " + email + " already exists");
 
-        User user = new User(email,passwordEncoder.encode(rawPassword), Role.TEACHER);
+        User user = new User(email, passwordEncoder.encode(rawPassword), Role.TEACHER);
         userRepository.save(user);
 
-        Teacher teacher = new Teacher(user,firstName,lastName);
+        Teacher teacher = new Teacher(user, firstName, lastName);
+        teacher.setGender(Gender.valueOf(gender.toUpperCase()));
         teacherRepository.save(teacher);
 
         return teacher;

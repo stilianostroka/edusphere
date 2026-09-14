@@ -61,7 +61,7 @@ public class Student {
         this.dateOfBirth = dateOfBirth;
         this.personalId = personalId;
         this.enrollmentDate = LocalDate.now();
-        this.status = StudentStatus.ACTIVE;
+        this.status = StudentStatus.REGISTERED;
     }
 
     public Long getId() {

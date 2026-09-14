@@ -32,7 +32,7 @@ public class TeacherController {
 
     @PostMapping
     public ResponseEntity<TeacherResponse> createTeacher(@RequestBody TeacherRequest request){
-        Teacher teacher = teacherService.createTeacher(request.email(),request.password(),request.name(), request.surname());
+        Teacher teacher = teacherService.createTeacher(request.email(), request.password(), request.name(), request.surname(), request.gender());
         return ResponseEntity.ok(toResponse(teacher));
     }
 

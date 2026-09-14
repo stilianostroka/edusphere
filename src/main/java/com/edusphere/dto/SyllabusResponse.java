@@ -1,16 +1,14 @@
 package com.edusphere.dto;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public record TopicResponse(
+public record SyllabusResponse(
         Long id,
         Long teachingAssignmentId,
         String schoolClassName,
         String subjectName,
-        LocalDate date,
-        String topicName,
-        String description,
-        LocalDateTime createdAt
-) {
-}
+        String fileUrl,
+        String originalFileName,
+        String contentType,
+        LocalDateTime uploadedAt
+) {}

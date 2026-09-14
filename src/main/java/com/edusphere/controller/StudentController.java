@@ -49,18 +49,21 @@ public class StudentController {
 
     @PostMapping("/{id}/enroll")
     public ResponseEntity<StudentResponse> enroll(@PathVariable Long id, @RequestBody EnrollStudentRequest request) {
-        Student student = studentService.getStudent(id);
-        SchoolClass schoolClass = schoolClassService.getById(request.classId());
-        Student enrolled = studentService.enrollInClass(student, schoolClass);
+        Student enrolled = studentService.enrollInClass(id, request.classId());
         return ResponseEntity.ok(toResponse(enrolled));
     }
 
-        @PutMapping("/{id}")
-        public ResponseEntity<StudentResponse> update (@PathVariable Long id, @RequestBody StudentUpdateRequest request)
-        {
-            Student student = studentService.getStudent(id);
+    @PutMapping("/{id}/status")
+    public ResponseEntity<Void> updateStatus(@PathVariable Long id, String status){
+        studentService.updateStatus(id,status);
+        return ResponseEntity.noContent().build();
+    }
+
+
+    @PutMapping("/{id}")
+    public ResponseEntity<StudentResponse> update (@PathVariable Long id, @RequestBody StudentUpdateRequest request) {
             Student updated = studentService.updateStudent(
-                    student, request.firstName(), request.lastName(), request.dateOfBirth(),
+                    id, request.firstName(), request.lastName(), request.dateOfBirth(),
                     request.personalId(), request.gender(), request.address()
             );
             return ResponseEntity.ok(toResponse(updated));

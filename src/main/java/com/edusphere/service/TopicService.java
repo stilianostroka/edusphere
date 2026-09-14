@@ -20,8 +20,18 @@ public class TopicService implements EditWindow {
         this.teachingAssignmentService = teachingAssignmentService;
     }
 
-    public List<Topic> getAll() {
-        return topicRepository.findAll();
+    public Topic getById(Long id){
+        return topicRepository.findById(id).orElseThrow(()-> new IllegalArgumentException("No topic found with this Id."));
+    }
+
+    public List<Topic> getByTeachingAssignmentAndDateRange(Long teachingAssignmentId, LocalDate start, LocalDate end) {
+        TeachingAssignment teachingAssignment = teachingAssignmentService.getById(teachingAssignmentId);
+        return topicRepository.findByTeachingAssignmentAndDateBetween(teachingAssignment, start, end);
+    }
+
+    public List<Topic> getAll(Long id) {
+        TeachingAssignment teachingAssignment = teachingAssignmentService.getById(id);
+        return topicRepository.findByTeachingAssignment(teachingAssignment);
     }
 
     public Topic createTopic(Long teachingAssignmentId, String topicName,

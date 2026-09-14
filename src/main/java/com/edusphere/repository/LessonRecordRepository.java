@@ -18,7 +18,7 @@ public interface LessonRecordRepository extends JpaRepository<LessonRecord, Long
             LocalDate start,
             LocalDate end
     );
-
+    List<LessonRecord>  findByTopic(Topic topic);
     List<LessonRecord> findByStudentAndAbsentTrue(Student student);
     long countByStudentAndAbsentTrue(Student student);
     Optional<LessonRecord> findByStudentAndTopic(Student student, Topic topic);
