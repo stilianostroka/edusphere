@@ -1,11 +1,9 @@
 package com.edusphere.service;
 
-import com.edusphere.entity.Gender;
-import com.edusphere.entity.SchoolClass;
-import com.edusphere.entity.Student;
-import com.edusphere.entity.StudentStatus;
+import com.edusphere.entity.*;
 import com.edusphere.repository.SchoolClassRepository;
 import com.edusphere.repository.StudentRepository;
+import com.edusphere.repository.TeacherRepository;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
@@ -16,11 +14,13 @@ public class StudentService {
     private final StudentRepository studentRepository;
     private final SchoolClassRepository schoolClassRepository;
     private final SchoolClassService schoolClassService;
+    private final TeacherRepository teacherRepository;
 
-    public StudentService(StudentRepository studentRepository, SchoolClassRepository schoolClassRepository, SchoolClassService schoolClassService) {
+    public StudentService(StudentRepository studentRepository, SchoolClassRepository schoolClassRepository, SchoolClassService schoolClassService, TeacherRepository teacherRepository) {
         this.studentRepository = studentRepository;
         this.schoolClassRepository = schoolClassRepository;
         this.schoolClassService = schoolClassService;
+        this.teacherRepository = teacherRepository;
     }
 
     public Student getStudent(Long id){
@@ -86,11 +86,13 @@ public class StudentService {
         return student;
     }
 
-    public void updateStatus(Long studentId, String status){
+    public void updateStatus(Long studentId, Long teacherId, String status){
         Student student = studentRepository.findById(studentId)
-                .orElseThrow(()-> new IllegalArgumentException("No student found with this ID."));
+                .orElseThrow(() -> new IllegalArgumentException("No student found with this ID."));
+        Teacher teacher = teacherRepository.findById(teacherId)
+                .orElseThrow(() -> new IllegalArgumentException("No teacher found with this ID."));
 
-        student.setStatus(StudentStatus.valueOf(status.toUpperCase()));
+        student.updateStatus(teacher, StudentStatus.valueOf(status.toUpperCase()));
         studentRepository.save(student);
     }
 }

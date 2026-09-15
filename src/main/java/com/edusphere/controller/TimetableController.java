@@ -3,6 +3,7 @@ package com.edusphere.controller;
 import com.edusphere.dto.TimetableSlotRequest;
 import com.edusphere.dto.TimetableSlotResponse;
 import com.edusphere.entity.TimetableSlot;
+import com.edusphere.security.CurrentUserProvider;
 import com.edusphere.service.TimetableService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,15 +15,18 @@ import java.util.List;
 public class TimetableController {
 
     private final TimetableService timetableService;
+    private final CurrentUserProvider currentUserProvider;
 
-    public TimetableController(TimetableService timetableService) {
+    public TimetableController(TimetableService timetableService, CurrentUserProvider currentUserProvider) {
         this.timetableService = timetableService;
+        this.currentUserProvider = currentUserProvider;
     }
 
     @PostMapping
     public ResponseEntity<TimetableSlotResponse> create(@RequestBody TimetableSlotRequest request) {
+        Long adminUserId = currentUserProvider.getCurrentUserId();
         TimetableSlot slot = timetableService.createTimeSlot(
-                request.adminUserId(), request.teachingAssignmentId(),
+                adminUserId, request.teachingAssignmentId(),
                 request.dayOfWeek(), request.startTime(), request.endTime()
         );
         return ResponseEntity.ok(toResponse(slot));
@@ -30,8 +34,9 @@ public class TimetableController {
 
     @PutMapping("/{id}")
     public ResponseEntity<TimetableSlotResponse> reschedule(@PathVariable Long id, @RequestBody TimetableSlotRequest request) {
+        Long adminUserId = currentUserProvider.getCurrentUserId();
         TimetableSlot slot = timetableService.rescheduleSlot(
-                request.adminUserId(), id, request.dayOfWeek(), request.startTime(), request.endTime()
+                adminUserId, id, request.dayOfWeek(), request.startTime(), request.endTime()
         );
         return ResponseEntity.ok(toResponse(slot));
     }

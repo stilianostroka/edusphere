@@ -1,11 +1,9 @@
 package com.edusphere.controller;
 
-import com.edusphere.dto.EnrollStudentRequest;
-import com.edusphere.dto.StudentRequest;
-import com.edusphere.dto.StudentResponse;
-import com.edusphere.dto.StudentUpdateRequest;
+import com.edusphere.dto.*;
 import com.edusphere.entity.SchoolClass;
 import com.edusphere.entity.Student;
+import com.edusphere.security.CurrentUserProvider;
 import com.edusphere.service.SchoolClassService;
 import com.edusphere.service.StudentService;
 import org.springframework.http.ResponseEntity;
@@ -19,10 +17,12 @@ public class StudentController {
 
     private final StudentService studentService;
     private final SchoolClassService schoolClassService;
+    private final CurrentUserProvider currentUserProvider;
 
-    public StudentController(StudentService studentService, SchoolClassService schoolClassService) {
+    public StudentController(StudentService studentService, SchoolClassService schoolClassService, CurrentUserProvider currentUserProvider) {
         this.studentService = studentService;
         this.schoolClassService = schoolClassService;
+        this.currentUserProvider = currentUserProvider;
     }
 
     @GetMapping("/{id}")
@@ -54,8 +54,9 @@ public class StudentController {
     }
 
     @PutMapping("/{id}/status")
-    public ResponseEntity<Void> updateStatus(@PathVariable Long id, String status){
-        studentService.updateStatus(id,status);
+    public ResponseEntity<Void> updateStatus(@PathVariable Long id, @RequestBody StudentStatusUpdateRequest request) {
+        Long teacherId = currentUserProvider.getCurrentTeacherId();
+        studentService.updateStatus(id, teacherId, request.status());
         return ResponseEntity.noContent().build();
     }
 

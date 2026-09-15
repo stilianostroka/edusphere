@@ -5,6 +5,7 @@ import com.edusphere.dto.TeacherResponse;
 import com.edusphere.entity.Teacher;
 import com.edusphere.service.TeacherService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,6 +31,7 @@ public class TeacherController {
         return ResponseEntity.ok(toResponse(teacher));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<TeacherResponse> createTeacher(@RequestBody TeacherRequest request){
         Teacher teacher = teacherService.createTeacher(request.email(), request.password(), request.name(), request.surname(), request.gender());

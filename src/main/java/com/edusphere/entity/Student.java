@@ -140,10 +140,6 @@ public class Student {
         return status;
     }
 
-    public void setStatus(StudentStatus status) {
-        this.status = status;
-    }
-
     public String getAddress() {
         return address;
     }
@@ -154,6 +150,15 @@ public class Student {
 
     public void setParents(Set<Parent> parents) {
         this.parents = parents;
+    }
+
+    public void updateStatus(Teacher supervisor, StudentStatus newStatus) {
+        if (schoolClass == null
+                || schoolClass.getSupervisorTeacher() == null
+                || !schoolClass.getSupervisorTeacher().getId().equals(supervisor.getId())) {
+            throw new IllegalArgumentException("Only the supervising teacher of the student's class can update status");
+        }
+        this.status = newStatus;
     }
 }
 

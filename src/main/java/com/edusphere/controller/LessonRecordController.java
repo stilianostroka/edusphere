@@ -6,6 +6,7 @@ import com.edusphere.dto.LessonRecordResponse;
 import com.edusphere.dto.MarkAbsentRequest;
 import com.edusphere.dto.UpdateGradeRequest;
 import com.edusphere.entity.LessonRecord;
+import com.edusphere.security.CurrentUserProvider;
 import com.edusphere.service.LessonRecordService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,9 +18,12 @@ import java.util.List;
 public class LessonRecordController {
 
     private final LessonRecordService lessonRecordService;
+    private final CurrentUserProvider currentUserProvider;
 
-    public LessonRecordController(LessonRecordService lessonRecordService) {
+
+    public LessonRecordController(LessonRecordService lessonRecordService, CurrentUserProvider currentUserProvider) {
         this.lessonRecordService = lessonRecordService;
+        this.currentUserProvider = currentUserProvider;
     }
 
     @GetMapping("/topic/{topicId}")
@@ -58,7 +62,8 @@ public class LessonRecordController {
 
     @PutMapping("/{id}/justify")
     public ResponseEntity<LessonRecordResponse> justifyAbsence(@PathVariable Long id, @RequestBody JustifyAbsenceRequest request) {
-        lessonRecordService.justifyAbsence(id, request.supervisorTeacherId(), request.note());
+        Long teacherId = currentUserProvider.getCurrentTeacherId();
+        lessonRecordService.justifyAbsence(id, teacherId, request.note());
         return ResponseEntity.ok(toResponse(lessonRecordService.getById(id)));
     }
 

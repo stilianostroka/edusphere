@@ -2,6 +2,7 @@ package com.edusphere.controller;
 
 import com.edusphere.dto.*;
 import com.edusphere.entity.ModificationRequest;
+import com.edusphere.security.CurrentUserProvider;
 import com.edusphere.service.ModificationRequestService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,15 +14,18 @@ import java.util.List;
 public class ModificationRequestController {
 
     private final ModificationRequestService modificationRequestService;
+    private final CurrentUserProvider currentUserProvider;
 
-    public ModificationRequestController(ModificationRequestService modificationRequestService) {
+    public ModificationRequestController(ModificationRequestService modificationRequestService, CurrentUserProvider currentUserProvider) {
         this.modificationRequestService = modificationRequestService;
+        this.currentUserProvider = currentUserProvider;
     }
 
     @PostMapping("/topic")
     public ResponseEntity<ModificationResponse> requestTopicChange(@RequestBody ModificationTopicRequest request) {
+        Long teacherId = currentUserProvider.getCurrentTeacherId();
         ModificationRequest modificationRequest = modificationRequestService.requestTopicChange(
-                request.teacherId(), request.topicId(), request.proposedTopicName(),
+                teacherId, request.topicId(), request.proposedTopicName(),
                 request.proposedDescription(), request.explanation()
         );
         return ResponseEntity.ok(toResponse(modificationRequest));
@@ -29,35 +33,40 @@ public class ModificationRequestController {
 
     @PostMapping("/grade")
     public ResponseEntity<ModificationResponse> requestGradeChange(@RequestBody GradeChangeRequest request) {
+        Long teacherId = currentUserProvider.getCurrentTeacherId();
         ModificationRequest modificationRequest = modificationRequestService.requestGradeChange(
-                request.teacherId(), request.lessonRecordId(), request.proposedGrade(), request.explanation()
-        );
-        return ResponseEntity.ok(toResponse(modificationRequest));
-    }
-
-    @PostMapping("/exam-grade")
-    public ResponseEntity<ModificationResponse> requestExamGradeChange(@RequestBody ExamGradeChangeRequest request) {
-        ModificationRequest modificationRequest = modificationRequestService.requestExamGradeChange(
-                request.teacherId(), request.semesterExamGradeId(), request.proposedExamGrade(), request.explanation()
+                teacherId, request.lessonRecordId(), request.proposedGrade(), request.explanation()
         );
         return ResponseEntity.ok(toResponse(modificationRequest));
     }
 
     @PostMapping("/absence")
     public ResponseEntity<ModificationResponse> requestAbsenceChange(@RequestBody AbsenceChangeRequest request) {
+        Long teacherId = currentUserProvider.getCurrentTeacherId();
         ModificationRequest modificationRequest = modificationRequestService.requestAbsenceChange(
-                request.teacherId(), request.lessonRecordId(), request.explanation()
+                teacherId, request.lessonRecordId(), request.explanation()
+        );
+        return ResponseEntity.ok(toResponse(modificationRequest));
+    }
+
+    @PostMapping("/exam-grade")
+    public ResponseEntity<ModificationResponse> requestExamGradeChange(@RequestBody ExamGradeChangeRequest request) {
+        Long teacherId = currentUserProvider.getCurrentTeacherId();
+        ModificationRequest modificationRequest = modificationRequestService.requestExamGradeChange(
+                teacherId, request.semesterExamGradeId(), request.proposedExamGrade(), request.explanation()
         );
         return ResponseEntity.ok(toResponse(modificationRequest));
     }
 
     @PutMapping("/{id}/approve")
-    public ResponseEntity<ModificationResponse> approve(@PathVariable Long id, @RequestParam Long adminUserId) {
+    public ResponseEntity<ModificationResponse> approve(@PathVariable Long id) {
+        Long adminUserId = currentUserProvider.getCurrentUserId();
         return ResponseEntity.ok(toResponse(modificationRequestService.approveRequest(id, adminUserId)));
     }
 
     @PutMapping("/{id}/reject")
-    public ResponseEntity<ModificationResponse> reject(@PathVariable Long id, @RequestParam Long adminUserId) {
+    public ResponseEntity<ModificationResponse> reject(@PathVariable Long id) {
+        Long adminUserId = currentUserProvider.getCurrentUserId();
         return ResponseEntity.ok(toResponse(modificationRequestService.rejectRequest(id, adminUserId)));
     }
 

@@ -4,6 +4,7 @@ import com.edusphere.dto.ClassGradeRosterEntry;
 import com.edusphere.dto.FinalSubjectGradeResponse;
 import com.edusphere.dto.ProjectGradeRequest;
 import com.edusphere.entity.FinalSubjectGrade;
+import com.edusphere.security.CurrentUserProvider;
 import com.edusphere.service.GradingService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,9 +16,11 @@ import java.util.List;
 public class FinalSubjectGradeController {
 
     private final GradingService gradingService;
+    private final CurrentUserProvider currentUserProvider;
 
-    public FinalSubjectGradeController(GradingService gradingService) {
+    public FinalSubjectGradeController(GradingService gradingService, CurrentUserProvider currentUserProvider) {
         this.gradingService = gradingService;
+        this.currentUserProvider = currentUserProvider;
     }
 
     @GetMapping("/roster/{teachingAssignmentId}")
@@ -65,12 +68,14 @@ public class FinalSubjectGradeController {
     }
 
     @PutMapping("/{id}/approve")
-    public ResponseEntity<FinalSubjectGradeResponse> approve(@PathVariable Long id, @RequestParam Long adminUserId) {
+    public ResponseEntity<FinalSubjectGradeResponse> approve(@PathVariable Long id) {
+        Long adminUserId = currentUserProvider.getCurrentUserId();
         return ResponseEntity.ok(toResponse(gradingService.approveFinalGrade(id, adminUserId)));
     }
 
     @PutMapping("/{id}/reject")
-    public ResponseEntity<FinalSubjectGradeResponse> reject(@PathVariable Long id, @RequestParam Long adminUserId) {
+    public ResponseEntity<FinalSubjectGradeResponse> reject(@PathVariable Long id) {
+        Long adminUserId = currentUserProvider.getCurrentUserId();
         return ResponseEntity.ok(toResponse(gradingService.rejectFinalGrade(id, adminUserId)));
     }
 

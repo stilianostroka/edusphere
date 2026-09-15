@@ -4,6 +4,7 @@ import com.edusphere.dto.NotificationResponse;
 import com.edusphere.dto.NotificationRequestToClass;
 import com.edusphere.dto.NotificationRequestToStudent;
 import com.edusphere.entity.Notification;
+import com.edusphere.security.CurrentUserProvider;
 import com.edusphere.service.NotificationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,34 +16,36 @@ import java.util.List;
 public class NotificationController {
 
     private final NotificationService notificationService;
+    private final CurrentUserProvider currentUserProvider;
 
-    public NotificationController(NotificationService notificationService) {
+    public NotificationController(NotificationService notificationService, CurrentUserProvider currentUserProvider) {
         this.notificationService = notificationService;
+        this.currentUserProvider = currentUserProvider;
     }
 
     @PostMapping("/student")
     public ResponseEntity<NotificationResponse> sendToStudent(@RequestBody NotificationRequestToStudent request) {
-        Notification notification = notificationService.sendToStudent(
-                request.teacherId(), request.studentId(), request.message()
-        );
+        Long teacherId = currentUserProvider.getCurrentTeacherId();
+        Notification notification = notificationService.sendToStudent(teacherId, request.studentId(), request.message());
         return ResponseEntity.ok(toResponse(notification));
     }
 
     @PostMapping("/class")
     public ResponseEntity<NotificationResponse> sendToClass(@RequestBody NotificationRequestToClass request) {
-        Notification notification = notificationService.sendToClass(
-                request.teacherId(), request.classId(), request.message()
-        );
+        Long teacherId = currentUserProvider.getCurrentTeacherId();
+        Notification notification = notificationService.sendToClass(teacherId, request.classId(), request.message());
         return ResponseEntity.ok(toResponse(notification));
     }
 
-    @GetMapping("/teacher/{teacherId}/sent")
-    public ResponseEntity<List<NotificationResponse>> getSentHistory(@PathVariable Long teacherId) {
+    @GetMapping("/sent")
+    public ResponseEntity<List<NotificationResponse>> getSentHistory() {
+        Long teacherId = currentUserProvider.getCurrentTeacherId();
         return ResponseEntity.ok(notificationService.getSentHistory(teacherId).stream().map(this::toResponse).toList());
     }
 
-    @GetMapping("/parent/{parentId}/inbox")
-    public ResponseEntity<List<NotificationResponse>> getInbox(@PathVariable Long parentId) {
+    @GetMapping("/inbox")
+    public ResponseEntity<List<NotificationResponse>> getInbox() {
+        Long parentId = currentUserProvider.getCurrentParentId();
         return ResponseEntity.ok(notificationService.getInboxForParent(parentId).stream().map(this::toResponse).toList());
     }
 

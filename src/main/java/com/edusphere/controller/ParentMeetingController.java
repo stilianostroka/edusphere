@@ -3,6 +3,7 @@ package com.edusphere.controller;
 import com.edusphere.dto.ParentMeetingRequest;
 import com.edusphere.dto.ParentMeetingResponse;
 import com.edusphere.entity.ParentMeeting;
+import com.edusphere.security.CurrentUserProvider;
 import com.edusphere.service.ParentMeetingService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,8 +15,10 @@ import java.util.List;
 public class ParentMeetingController {
 
     private final ParentMeetingService parentMeetingService;
-    public ParentMeetingController(ParentMeetingService parentMeetingService) {
+    private final CurrentUserProvider currentUserProvider;
+    public ParentMeetingController(ParentMeetingService parentMeetingService, CurrentUserProvider currentUserProvider) {
         this.parentMeetingService = parentMeetingService;
+        this.currentUserProvider = currentUserProvider;
     }
 
     @GetMapping("/class/{classId}")
@@ -25,19 +28,21 @@ public class ParentMeetingController {
 
     @PostMapping
     public ResponseEntity<ParentMeetingResponse> record(@RequestBody ParentMeetingRequest request){
-        ParentMeeting parentMeeting = parentMeetingService.recordMeeting(request.teacherId(),request.classId(),
-                request.meetingTime(),request.topic());
+        Long teacherId = currentUserProvider.getCurrentTeacherId();
+        ParentMeeting parentMeeting = parentMeetingService.recordMeeting(teacherId, request.classId(), request.meetingTime(), request.topic());
         return ResponseEntity.ok(toResponse(parentMeeting));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ParentMeetingResponse> update(@PathVariable Long id, @RequestBody ParentMeetingRequest request){
-        ParentMeeting parentMeeting = parentMeetingService.editMeeting(id, request.teacherId(), request.meetingTime(), request.topic());
+        Long teacherId = currentUserProvider.getCurrentTeacherId();
+        ParentMeeting parentMeeting = parentMeetingService.editMeeting(id, teacherId, request.meetingTime(), request.topic());
         return ResponseEntity.ok(toResponse(parentMeeting));
     }
 
     @DeleteMapping("/{parentMeetingId}")
-    public ResponseEntity<Void> delete(@PathVariable Long parentMeetingId, @RequestParam Long teacherId){
+    public ResponseEntity<Void> delete(@PathVariable Long parentMeetingId){
+        Long teacherId = currentUserProvider.getCurrentTeacherId();
         parentMeetingService.deleteMeeting(parentMeetingId, teacherId);
         return ResponseEntity.noContent().build();
     }

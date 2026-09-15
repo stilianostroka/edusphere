@@ -5,6 +5,7 @@ import com.edusphere.dto.ParentResponse;
 import com.edusphere.entity.Parent;
 import com.edusphere.service.ParentService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,6 +30,7 @@ public class ParentController {
         return ResponseEntity.ok(toResponse(parentService.getById(id)));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<ParentResponse> create(@RequestBody ParentRequest request){
         Parent parent = parentService.createParent(
