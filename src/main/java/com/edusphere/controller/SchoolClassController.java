@@ -22,9 +22,15 @@ public class SchoolClassController {
     }
 
     @GetMapping
-    public ResponseEntity<List<SchoolClassResponse>> getAllClasses(){
-       return ResponseEntity.ok(schoolClassService.getAll().stream().map(this::toResponse).toList());
+    public ResponseEntity<List<SchoolClassResponse>> getAllClasses(
+            @RequestParam(required = false) Long academicYearId
+    ) {
+        List<SchoolClass> classes = academicYearId != null
+                ? schoolClassService.getByAcademicYear(academicYearId)
+                : schoolClassService.getAll();
+        return ResponseEntity.ok(classes.stream().map(this::toResponse).toList());
     }
+
 
     @GetMapping("/{classId}")
     public ResponseEntity<SchoolClassResponse> getSchoolClass(@PathVariable Long classId){

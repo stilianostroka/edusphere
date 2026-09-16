@@ -1,9 +1,6 @@
 package com.edusphere.service;
 
-import com.edusphere.entity.SchoolClass;
-import com.edusphere.entity.Subject;
-import com.edusphere.entity.Teacher;
-import com.edusphere.entity.TeachingAssignment;
+import com.edusphere.entity.*;
 import com.edusphere.repository.TeachingAssignmentRepository;
 import com.edusphere.repository.TopicRepository;
 import org.springframework.stereotype.Service;
@@ -18,13 +15,15 @@ public class TeachingAssignmentService {
     private final SchoolClassService schoolClassService;
     private final TeacherService teacherService;
     private final SubjectService subjectService;
+    private final AcademicYearService academicYearService;
 
-    public TeachingAssignmentService(TeachingAssignmentRepository teachingAssignmentRepository, TopicRepository topicRepository, SchoolClassService schoolClassService, TeacherService teacherService, SubjectService subjectService) {
+    public TeachingAssignmentService(TeachingAssignmentRepository teachingAssignmentRepository, TopicRepository topicRepository, SchoolClassService schoolClassService, TeacherService teacherService, SubjectService subjectService, AcademicYearService academicYearService) {
         this.teachingAssignmentRepository = teachingAssignmentRepository;
         this.topicRepository = topicRepository;
         this.schoolClassService = schoolClassService;
         this.teacherService = teacherService;
         this.subjectService = subjectService;
+        this.academicYearService = academicYearService;
     }
 
     public TeachingAssignment createAssignment(Long schoolClassId, Long teacherId, Long subjectId){
@@ -44,6 +43,11 @@ public class TeachingAssignmentService {
 
     public long calculateHoursTaught(TeachingAssignment teachingAssignment){
         return topicRepository.countByTeachingAssignment(teachingAssignment);
+    }
+
+    public List<TeachingAssignment> getByAcademicYear(Long academicYearId) {
+        AcademicYear academicYear = academicYearService.getById(academicYearId);
+        return teachingAssignmentRepository.findBySchoolClass_AcademicYear(academicYear);
     }
 
     public TeachingAssignment getById(Long id){

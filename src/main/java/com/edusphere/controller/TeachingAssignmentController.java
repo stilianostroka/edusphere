@@ -21,8 +21,11 @@ public class TeachingAssignmentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TeachingAssignmentResponse>> getAll() {
-        return ResponseEntity.ok(teachingAssignmentService.getAll().stream().map(this::toResponse).toList());
+    public ResponseEntity<List<TeachingAssignmentResponse>> getAll(@RequestParam(required = false) Long academicYearId) {
+        List<TeachingAssignment> assignments = academicYearId != null
+                ? teachingAssignmentService.getByAcademicYear(academicYearId)
+                : teachingAssignmentService.getAll();
+        return ResponseEntity.ok(assignments.stream().map(this::toResponse).toList());
     }
 
     @GetMapping("/teacher/{teacherId}")

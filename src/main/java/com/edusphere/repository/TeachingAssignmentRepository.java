@@ -1,9 +1,6 @@
 package com.edusphere.repository;
 
-import com.edusphere.entity.SchoolClass;
-import com.edusphere.entity.Subject;
-import com.edusphere.entity.Teacher;
-import com.edusphere.entity.TeachingAssignment;
+import com.edusphere.entity.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -15,4 +12,5 @@ public interface TeachingAssignmentRepository extends JpaRepository<TeachingAssi
     Optional<TeachingAssignment> findBySchoolClassAndSubject(SchoolClass schoolClass, Subject subject);
     List<TeachingAssignment> findBySchoolClass(SchoolClass schoolClass);
     List<TeachingAssignment> findByTeacher(Teacher teacher);
+    List<TeachingAssignment> findBySchoolClass_AcademicYear(AcademicYear academicYear);
 }

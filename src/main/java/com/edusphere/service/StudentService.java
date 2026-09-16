@@ -15,12 +15,14 @@ public class StudentService {
     private final SchoolClassRepository schoolClassRepository;
     private final SchoolClassService schoolClassService;
     private final TeacherRepository teacherRepository;
+    private final AcademicYearService academicYearService;
 
-    public StudentService(StudentRepository studentRepository, SchoolClassRepository schoolClassRepository, SchoolClassService schoolClassService, TeacherRepository teacherRepository) {
+    public StudentService(StudentRepository studentRepository, SchoolClassRepository schoolClassRepository, SchoolClassService schoolClassService, TeacherRepository teacherRepository, AcademicYearService academicYearService) {
         this.studentRepository = studentRepository;
         this.schoolClassRepository = schoolClassRepository;
         this.schoolClassService = schoolClassService;
         this.teacherRepository = teacherRepository;
+        this.academicYearService = academicYearService;
     }
 
     public Student getStudent(Long id){
@@ -33,6 +35,11 @@ public class StudentService {
 
     public List<Student> getBySchoolClass(SchoolClass schoolClass) {
         return studentRepository.findAllBySchoolClass(schoolClass);
+    }
+
+    public List<Student> getByAcademicYear(Long academicYearId) {
+        AcademicYear academicYear = academicYearService.getById(academicYearId);
+        return studentRepository.findAllBySchoolClass_AcademicYear(academicYear);
     }
 
     public Student createStudent(String firstName, String lastName,

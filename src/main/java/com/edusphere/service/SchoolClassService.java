@@ -24,6 +24,11 @@ public class SchoolClassService {
         this.teacherService = teacherService;
     }
 
+    public List<SchoolClass> getByAcademicYear(Long academicYearId) {
+        AcademicYear academicYear = academicYearService.getById(academicYearId);
+        return schoolClassRepository.findByAcademicYear(academicYear);
+    }
+
     public SchoolClass getById(Long id) {
         return schoolClassRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("No class found with id " + id));

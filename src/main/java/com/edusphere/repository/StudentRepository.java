@@ -11,4 +11,5 @@ public interface StudentRepository extends JpaRepository<Student,Long> {
     List<Student> findByParents(Parent parent);
     List<Student> findByStatus(StudentStatus status);
     boolean existsByPersonalId(String personalId);
+    List<Student> findAllBySchoolClass_AcademicYear(AcademicYear academicYear);
 }
