@@ -201,4 +201,8 @@ public class GradingService  implements EditWindow{
         }
         return roster;
     }
+
+    public List<FinalSubjectGrade> getAllSubmitted() {
+        return finalSubjectGradeRepository.findAllByStatus(FinalGradeStatus.SUBMITTED);
+    }
 }

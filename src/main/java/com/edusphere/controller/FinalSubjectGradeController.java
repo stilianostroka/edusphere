@@ -97,4 +97,9 @@ public class FinalSubjectGradeController {
                 finalSubjectGrade.getApprovedAt()
         );
     }
+
+    @GetMapping("/submitted")
+    public ResponseEntity<List<FinalSubjectGradeResponse>> getAllSubmitted() {
+        return ResponseEntity.ok(gradingService.getAllSubmitted().stream().map(this::toResponse).toList());
+    }
 }
