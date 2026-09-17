@@ -6,6 +6,7 @@ import com.edusphere.entity.Subject;
 import com.edusphere.service.SubjectService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -34,6 +35,7 @@ public class SubjectController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<SubjectResponse> create(@RequestBody SubjectRequest subjectRequest){
         Subject subject = subjectService.createSubject(subjectRequest.subjectName(),
                 subjectRequest.totalHours(), subjectRequest.programYear(), subjectRequest.code());

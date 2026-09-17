@@ -6,6 +6,11 @@ public record StudentResponse(
         String className,
         String firstName,
         String lastName,
-        String status
+        String status,
+        String personalId,
+        java.time.LocalDate dateOfBirth,
+        String gender,
+        String address,
+        java.time.LocalDate enrollmentDate
 ) {
 }

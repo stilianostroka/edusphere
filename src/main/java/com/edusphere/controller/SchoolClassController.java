@@ -6,8 +6,10 @@ import com.edusphere.dto.SchoolClassResponse;
 import com.edusphere.entity.SchoolClass;
 import com.edusphere.entity.Teacher;
 import com.edusphere.service.SchoolClassService;
+import com.edusphere.security.CurrentUserProvider;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -16,21 +18,25 @@ import java.util.List;
 public class SchoolClassController {
 
     private final SchoolClassService schoolClassService;
+    private final CurrentUserProvider currentUserProvider;
 
-    public SchoolClassController(SchoolClassService schoolClassService) {
+    public SchoolClassController(SchoolClassService schoolClassService, CurrentUserProvider currentUserProvider) {
         this.schoolClassService = schoolClassService;
+        this.currentUserProvider = currentUserProvider;
     }
 
     @GetMapping
-    public ResponseEntity<List<SchoolClassResponse>> getAllClasses(
-            @RequestParam(required = false) Long academicYearId
-    ) {
-        List<SchoolClass> classes = academicYearId != null
-                ? schoolClassService.getByAcademicYear(academicYearId)
-                : schoolClassService.getAll();
+    public ResponseEntity<List<SchoolClassResponse>> getAllClasses(@RequestParam(required = false) Long academicYearId){
+        List<SchoolClass> classes = academicYearId == null ? schoolClassService.getAll()
+                : schoolClassService.getByAcademicYear(academicYearId);
         return ResponseEntity.ok(classes.stream().map(this::toResponse).toList());
     }
 
+    @GetMapping("/supervised/me")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<SchoolClassResponse> getMySupervisedClass() {
+        return ResponseEntity.ok(toResponse(schoolClassService.getSupervisedBy(currentUserProvider.getCurrentTeacherId())));
+    }
 
     @GetMapping("/{classId}")
     public ResponseEntity<SchoolClassResponse> getSchoolClass(@PathVariable Long classId){
@@ -41,6 +47,7 @@ public class SchoolClassController {
 
 
     @PostMapping("/create")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<SchoolClassResponse> create(@RequestBody SchoolClassRequest request){
         SchoolClass schoolClass = schoolClassService.createSchoolClass(request.academicYearId(), request.className(),
                 request.classYear(), request.maxStudents());
@@ -49,6 +56,7 @@ public class SchoolClassController {
     }
 
     @PutMapping("/{classId}/assign-supervisor")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<SchoolClassResponse> assignSupervisor(@PathVariable Long classId,
                                                                 @RequestBody AssignSupervisorRequest request){
         SchoolClass updated = schoolClassService.assignSupervisor(classId, request.teacherId());
@@ -67,5 +75,3 @@ public class SchoolClassController {
     }
 
 }
-
-

@@ -15,14 +15,12 @@ public class StudentService {
     private final SchoolClassRepository schoolClassRepository;
     private final SchoolClassService schoolClassService;
     private final TeacherRepository teacherRepository;
-    private final AcademicYearService academicYearService;
 
-    public StudentService(StudentRepository studentRepository, SchoolClassRepository schoolClassRepository, SchoolClassService schoolClassService, TeacherRepository teacherRepository, AcademicYearService academicYearService) {
+    public StudentService(StudentRepository studentRepository, SchoolClassRepository schoolClassRepository, SchoolClassService schoolClassService, TeacherRepository teacherRepository) {
         this.studentRepository = studentRepository;
         this.schoolClassRepository = schoolClassRepository;
         this.schoolClassService = schoolClassService;
         this.teacherRepository = teacherRepository;
-        this.academicYearService = academicYearService;
     }
 
     public Student getStudent(Long id){
@@ -37,18 +35,22 @@ public class StudentService {
         return studentRepository.findAllBySchoolClass(schoolClass);
     }
 
-    public List<Student> getByAcademicYear(Long academicYearId) {
-        AcademicYear academicYear = academicYearService.getById(academicYearId);
-        return studentRepository.findAllBySchoolClass_AcademicYear(academicYear);
+    public List<Student> getByParent(Parent parent) {
+        return studentRepository.findByParents(parent);
+    }
+
+    public Student save(Student student) {
+        return studentRepository.save(student);
     }
 
     public Student createStudent(String firstName, String lastName,
-                                 LocalDate dateOfBirth, String personalId){
+                                 LocalDate dateOfBirth, String personalId, String gender, String address){
         if(studentRepository.existsByPersonalId(personalId)){
             throw new IllegalArgumentException("Student: "+ firstName +" "+ lastName +" with id number"
                     + personalId +" already exists.");
         }
-        Student student = new Student(firstName,lastName,dateOfBirth,personalId);
+        Student student = new Student(firstName, lastName, dateOfBirth, personalId,
+                Gender.valueOf(gender.toUpperCase()), address);
 
         studentRepository.save(student);
 
@@ -78,7 +80,7 @@ public class StudentService {
     public Student enrollInClass(Long studentId, Long schoolClassId){
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(()-> new IllegalArgumentException("No student found with this ID."));
-        SchoolClass schoolClass = schoolClassService.getById(studentId);
+        SchoolClass schoolClass = schoolClassService.getById(schoolClassId);
 
         if (student.getSchoolClass() != null && student.getSchoolClass().getId().equals(schoolClass.getId())) {
             throw new IllegalArgumentException("This student is already enrolled in this class!");
@@ -89,6 +91,9 @@ public class StudentService {
         }
 
         student.setSchoolClass(schoolClass);
+        if (student.getStatus() == StudentStatus.REGISTERED) {
+            student.setStatus(StudentStatus.ACTIVE);
+        }
         studentRepository.save(student);
         return student;
     }
@@ -103,5 +108,3 @@ public class StudentService {
         studentRepository.save(student);
     }
 }
-
-

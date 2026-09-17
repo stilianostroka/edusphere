@@ -8,6 +8,7 @@ import com.edusphere.security.CurrentUserProvider;
 import com.edusphere.service.GradingService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -55,6 +56,7 @@ public class FinalSubjectGradeController {
     }
 
     @PostMapping("/project-grade")
+    @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<FinalSubjectGradeResponse> setProjectGrade(@RequestBody ProjectGradeRequest request) {
         FinalSubjectGrade finalSubjectGrade = gradingService.setProjectGrade(
                 request.teachingAssignmentId(), request.studentId(), request.projectGrade()
@@ -63,17 +65,20 @@ public class FinalSubjectGradeController {
     }
 
     @PostMapping("/{id}/submit")
+    @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<FinalSubjectGradeResponse> submit(@PathVariable Long id) {
         return ResponseEntity.ok(toResponse(gradingService.submitFinalGrade(id)));
     }
 
     @PutMapping("/{id}/approve")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<FinalSubjectGradeResponse> approve(@PathVariable Long id) {
         Long adminUserId = currentUserProvider.getCurrentUserId();
         return ResponseEntity.ok(toResponse(gradingService.approveFinalGrade(id, adminUserId)));
     }
 
     @PutMapping("/{id}/reject")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<FinalSubjectGradeResponse> reject(@PathVariable Long id) {
         Long adminUserId = currentUserProvider.getCurrentUserId();
         return ResponseEntity.ok(toResponse(gradingService.rejectFinalGrade(id, adminUserId)));
@@ -99,6 +104,7 @@ public class FinalSubjectGradeController {
     }
 
     @GetMapping("/submitted")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<FinalSubjectGradeResponse>> getAllSubmitted() {
         return ResponseEntity.ok(gradingService.getAllSubmitted().stream().map(this::toResponse).toList());
     }

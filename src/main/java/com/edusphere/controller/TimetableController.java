@@ -7,6 +7,7 @@ import com.edusphere.security.CurrentUserProvider;
 import com.edusphere.service.TimetableService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -23,6 +24,7 @@ public class TimetableController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<TimetableSlotResponse> create(@RequestBody TimetableSlotRequest request) {
         Long adminUserId = currentUserProvider.getCurrentUserId();
         TimetableSlot slot = timetableService.createTimeSlot(
@@ -33,6 +35,7 @@ public class TimetableController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<TimetableSlotResponse> reschedule(@PathVariable Long id, @RequestBody TimetableSlotRequest request) {
         Long adminUserId = currentUserProvider.getCurrentUserId();
         TimetableSlot slot = timetableService.rescheduleSlot(

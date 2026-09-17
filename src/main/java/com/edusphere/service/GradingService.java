@@ -84,7 +84,7 @@ public class GradingService  implements EditWindow{
                 throw new IllegalStateException(
                         "The 24-hour edit window has passed for this exam grade; submit a modification request instead"
                 );
-                }
+            }
             existing.get().setExamGrade(examGrade);
             semesterExamGradeRepository.save(existing.get());
             return existing.get();
@@ -188,6 +188,7 @@ public class GradingService  implements EditWindow{
                     .findByStudentAndTeachingAssignment(student, teachingAssignment);
 
             roster.add(new ClassGradeRosterEntry(
+                    finalGrade.map(FinalSubjectGrade::getId).orElse(null),
                     student.getId(),
                     student.getFirstName(),
                     student.getLastName(),

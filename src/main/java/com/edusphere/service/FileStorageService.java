@@ -36,4 +36,16 @@ public class FileStorageService {
             throw new IllegalStateException("Failed to store the uploaded file: " + e.getMessage(), e);
         }
     }
+
+    public String storeDiploma(String baseName, byte[] contents) {
+        try {
+            Path uploadPath = Paths.get(uploadDir, "diplomas");
+            Files.createDirectories(uploadPath);
+            String storedFilename = baseName.replaceAll("[^a-zA-Z0-9-_]", "-") + "-" + UUID.randomUUID() + ".pdf";
+            Files.write(uploadPath.resolve(storedFilename), contents);
+            return "/files/diplomas/" + storedFilename;
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to store diploma: " + e.getMessage(), e);
+        }
+    }
 }

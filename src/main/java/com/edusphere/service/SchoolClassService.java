@@ -24,11 +24,6 @@ public class SchoolClassService {
         this.teacherService = teacherService;
     }
 
-    public List<SchoolClass> getByAcademicYear(Long academicYearId) {
-        AcademicYear academicYear = academicYearService.getById(academicYearId);
-        return schoolClassRepository.findByAcademicYear(academicYear);
-    }
-
     public SchoolClass getById(Long id) {
         return schoolClassRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("No class found with id " + id));
@@ -36,6 +31,16 @@ public class SchoolClassService {
 
     public List<SchoolClass> getAll(){
         return schoolClassRepository.findAll();
+    }
+
+    public List<SchoolClass> getByAcademicYear(Long academicYearId) {
+        return schoolClassRepository.findByAcademicYear(academicYearService.getById(academicYearId));
+    }
+
+    public SchoolClass getSupervisedBy(Long teacherId) {
+        Teacher teacher = teacherService.getById(teacherId);
+        return schoolClassRepository.findBySupervisorTeacher(teacher)
+                .orElseThrow(() -> new IllegalArgumentException("This teacher does not supervise a class"));
     }
 
     public SchoolClass createSchoolClass(Long academicYearId,
@@ -68,5 +73,4 @@ public class SchoolClassService {
         return schoolClass;
     }
 }
-
 

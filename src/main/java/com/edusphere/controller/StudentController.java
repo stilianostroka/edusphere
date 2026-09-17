@@ -3,11 +3,13 @@ package com.edusphere.controller;
 import com.edusphere.dto.*;
 import com.edusphere.entity.SchoolClass;
 import com.edusphere.entity.Student;
+import com.edusphere.entity.StudentStatus;
 import com.edusphere.security.CurrentUserProvider;
 import com.edusphere.service.SchoolClassService;
 import com.edusphere.service.StudentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -32,10 +34,10 @@ public class StudentController {
 
     @GetMapping
     public ResponseEntity<List<StudentResponse>> getAll(@RequestParam(required = false) Long academicYearId) {
-        List<Student> students = academicYearId != null
-                ? studentService.getByAcademicYear(academicYearId)
-                : studentService.getAll();
-        return ResponseEntity.ok(students.stream().map(this::toResponse).toList());
+        return ResponseEntity.ok(studentService.getAll().stream()
+                .filter(student -> academicYearId == null || (student.getSchoolClass() != null
+                        && student.getSchoolClass().getAcademicYear().getId().equals(academicYearId)))
+                .map(this::toResponse).toList());
     }
 
     @GetMapping("/class/{classId}")
@@ -45,18 +47,22 @@ public class StudentController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<StudentResponse> createStudent(@RequestBody StudentRequest request) {
-        Student student = studentService.createStudent(request.firstName(), request.lastName(), request.dateOfBirth(), request.personalId());
+        Student student = studentService.createStudent(request.firstName(), request.lastName(), request.dateOfBirth(),
+                request.personalId(), request.gender(), request.address());
         return ResponseEntity.ok(toResponse(student));
     }
 
     @PostMapping("/{id}/enroll")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<StudentResponse> enroll(@PathVariable Long id, @RequestBody EnrollStudentRequest request) {
         Student enrolled = studentService.enrollInClass(id, request.classId());
         return ResponseEntity.ok(toResponse(enrolled));
     }
 
     @PutMapping("/{id}/status")
+    @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<Void> updateStatus(@PathVariable Long id, @RequestBody StudentStatusUpdateRequest request) {
         Long teacherId = currentUserProvider.getCurrentTeacherId();
         studentService.updateStatus(id, teacherId, request.status());
@@ -65,23 +71,31 @@ public class StudentController {
 
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<StudentResponse> update (@PathVariable Long id, @RequestBody StudentUpdateRequest request) {
-            Student updated = studentService.updateStudent(
-                    id, request.firstName(), request.lastName(), request.dateOfBirth(),
-                    request.personalId(), request.gender(), request.address()
-            );
-            return ResponseEntity.ok(toResponse(updated));
-        }
-
-        private StudentResponse toResponse (Student student){
-            SchoolClass schoolClass = student.getSchoolClass();
-            return new StudentResponse(
-                    student.getId(),
-                    schoolClass != null ? schoolClass.getId() : null,
-                    schoolClass != null ? schoolClass.getClassName() : null,
-                    student.getFirstName(),
-                    student.getLastName(),
-                    student.getStatus().name()
-            );
-        }
+        Student updated = studentService.updateStudent(
+                id, request.firstName(), request.lastName(), request.dateOfBirth(),
+                request.personalId(), request.gender(), request.address()
+        );
+        return ResponseEntity.ok(toResponse(updated));
     }
+
+    private StudentResponse toResponse (Student student){
+        SchoolClass schoolClass = student.getSchoolClass();
+        return new StudentResponse(
+                student.getId(),
+                schoolClass != null ? schoolClass.getId() : null,
+                schoolClass != null ? schoolClass.getClassName() : null,
+                student.getFirstName(),
+                student.getLastName(),
+                student.getStatus() != null
+                        ? student.getStatus().name()
+                        : StudentStatus.REGISTERED.name(),
+                student.getPersonalId(),
+                student.getDateOfBirth(),
+                student.getGender() != null ? student.getGender().name() : null,
+                student.getAddress(),
+                student.getEnrollmentDate()
+        );
+    }
+}

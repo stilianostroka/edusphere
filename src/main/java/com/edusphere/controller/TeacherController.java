@@ -39,17 +39,18 @@ public class TeacherController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<TeacherResponse> updateTeacher(@PathVariable Long id, @RequestBody TeacherRequest request){
-        Teacher teacher = teacherService.updateTeacher(id, request.email(), request.name(), request.surname());
+        Teacher teacher = teacherService.updateTeacher(id, request.email(), request.name(), request.surname(),
+                request.gender(), request.password());
 
         return ResponseEntity.ok(toResponse(teacher));
     }
 
     private TeacherResponse toResponse(Teacher teacher) {
         return new TeacherResponse(
-                teacher.getId(), teacher.getFirstName(), teacher.getLastName(), teacher.getUser().getEmail()
+                teacher.getId(), teacher.getFirstName(), teacher.getLastName(), teacher.getUser().getEmail(),
+                teacher.getGender() != null ? teacher.getGender().name() : null
         );
     }
 }
-
-

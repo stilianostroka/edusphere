@@ -40,7 +40,8 @@ public class TeacherService {
         return teacher;
     }
 
-    public Teacher updateTeacher(Long teacherId, String newEmail, String newFirstName, String newLastName) {
+    public Teacher updateTeacher(Long teacherId, String newEmail, String newFirstName, String newLastName,
+                                 String gender, String rawPassword) {
         Teacher teacher = teacherRepository.findById(teacherId)
                 .orElseThrow(()-> new IllegalArgumentException("No teacher found with that ID."));
         User user = teacher.getUser();
@@ -54,6 +55,13 @@ public class TeacherService {
 
         teacher.setFirstName(newFirstName);
         teacher.setLastName(newLastName);
+        if (gender != null && !gender.isBlank()) {
+            teacher.setGender(Gender.valueOf(gender.toUpperCase()));
+        }
+        if (rawPassword != null && !rawPassword.isBlank()) {
+            user.setPasswordHash(passwordEncoder.encode(rawPassword));
+            userRepository.save(user);
+        }
         teacherRepository.save(teacher);
 
         return teacher;
@@ -68,5 +76,4 @@ public class TeacherService {
         return teacherRepository.findAll();
     }
 }
-
 

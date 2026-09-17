@@ -55,11 +55,13 @@ public class Student {
     public Student() {
     }
 
-    public Student(String firstName, String lastName, LocalDate dateOfBirth, String personalId) {
+    public Student(String firstName, String lastName, LocalDate dateOfBirth, String personalId, Gender gender, String address) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
         this.personalId = personalId;
+        this.gender = gender;
+        this.address = address;
         this.enrollmentDate = LocalDate.now();
         this.status = StudentStatus.REGISTERED;
     }
@@ -160,6 +162,9 @@ public class Student {
         }
         this.status = newStatus;
     }
-}
 
+    public void setStatus(StudentStatus status) {
+        this.status = status;
+    }
+}
 

@@ -7,6 +7,7 @@ import com.edusphere.entity.AcademicYear;
 import com.edusphere.service.AcademicYearService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -43,12 +44,13 @@ public class AcademicYearController {
         AcademicYear year = academicYearService.getById(id);
 
         List<GradingPeriodSummary> periods = academicYearService.getGradingPeriods(year).stream()
-                .map(p -> new GradingPeriodSummary(p.getSequenceNumber(), p.getStartDate(), p.getEndDate()))
+                .map(p -> new GradingPeriodSummary(p.getId(), p.getSequenceNumber(), p.getStartDate(), p.getEndDate()))
                 .toList();
         return ResponseEntity.ok(periods);
     }
 
     @PostMapping("/create")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AcademicYearResponse> create(@RequestBody AcademicYearRequest request){
         AcademicYear academicYear = academicYearService.createAcademicYear(request.label(), request.startDate(),
                 request.endDate(), request.period1End(), request.period2End());
@@ -57,12 +59,14 @@ public class AcademicYearController {
     }
 
     @PutMapping("/{id}/activate")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> activate(@PathVariable Long id){
         academicYearService.setCurrentYear(academicYearService.getById(id));
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}/deactivate")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deactivate(@PathVariable Long id){
         academicYearService.deactivate(academicYearService.getById(id));
         return ResponseEntity.noContent().build();

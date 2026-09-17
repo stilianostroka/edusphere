@@ -8,6 +8,7 @@ import com.edusphere.security.CurrentUserProvider;
 import com.edusphere.service.NotificationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -24,6 +25,7 @@ public class NotificationController {
     }
 
     @PostMapping("/student")
+    @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<NotificationResponse> sendToStudent(@RequestBody NotificationRequestToStudent request) {
         Long teacherId = currentUserProvider.getCurrentTeacherId();
         Notification notification = notificationService.sendToStudent(teacherId, request.studentId(), request.message());
@@ -31,6 +33,7 @@ public class NotificationController {
     }
 
     @PostMapping("/class")
+    @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<NotificationResponse> sendToClass(@RequestBody NotificationRequestToClass request) {
         Long teacherId = currentUserProvider.getCurrentTeacherId();
         Notification notification = notificationService.sendToClass(teacherId, request.classId(), request.message());
@@ -38,12 +41,14 @@ public class NotificationController {
     }
 
     @GetMapping("/sent")
+    @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<List<NotificationResponse>> getSentHistory() {
         Long teacherId = currentUserProvider.getCurrentTeacherId();
         return ResponseEntity.ok(notificationService.getSentHistory(teacherId).stream().map(this::toResponse).toList());
     }
 
     @GetMapping("/inbox")
+    @PreAuthorize("hasRole('PARENT')")
     public ResponseEntity<List<NotificationResponse>> getInbox() {
         Long parentId = currentUserProvider.getCurrentParentId();
         return ResponseEntity.ok(notificationService.getInboxForParent(parentId).stream().map(this::toResponse).toList());

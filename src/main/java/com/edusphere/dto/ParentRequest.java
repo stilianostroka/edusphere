@@ -5,5 +5,7 @@ public record ParentRequest(
         String password,
         String firstName,
         String lastName,
-        String gender
+        String gender,
+        String address,
+        String phoneNumber
 ) {}

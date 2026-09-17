@@ -13,6 +13,6 @@ public interface SchoolClassRepository extends JpaRepository<SchoolClass,Long> {
     Optional<SchoolClass> findByAcademicYearAndClassName(AcademicYear academicYear, String className);
     boolean existsByAcademicYearAndClassName(AcademicYear academicYear, String className);
     boolean existsByAcademicYearAndSupervisorTeacher(AcademicYear academicYear, Teacher supervisorTeacher);
+    Optional<SchoolClass> findBySupervisorTeacher(Teacher supervisorTeacher);
 }
-
 

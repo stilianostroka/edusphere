@@ -6,5 +6,7 @@ public record StudentRequest(
         String firstName,
         String lastName,
         LocalDate dateOfBirth,
-        String personalId
+        String personalId,
+        String gender,
+        String address
 ) {}

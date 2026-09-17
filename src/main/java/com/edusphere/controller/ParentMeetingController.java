@@ -7,6 +7,7 @@ import com.edusphere.security.CurrentUserProvider;
 import com.edusphere.service.ParentMeetingService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -27,6 +28,7 @@ public class ParentMeetingController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<ParentMeetingResponse> record(@RequestBody ParentMeetingRequest request){
         Long teacherId = currentUserProvider.getCurrentTeacherId();
         ParentMeeting parentMeeting = parentMeetingService.recordMeeting(teacherId, request.classId(), request.meetingTime(), request.topic());
@@ -34,6 +36,7 @@ public class ParentMeetingController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<ParentMeetingResponse> update(@PathVariable Long id, @RequestBody ParentMeetingRequest request){
         Long teacherId = currentUserProvider.getCurrentTeacherId();
         ParentMeeting parentMeeting = parentMeetingService.editMeeting(id, teacherId, request.meetingTime(), request.topic());
@@ -41,6 +44,7 @@ public class ParentMeetingController {
     }
 
     @DeleteMapping("/{parentMeetingId}")
+    @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<Void> delete(@PathVariable Long parentMeetingId){
         Long teacherId = currentUserProvider.getCurrentTeacherId();
         parentMeetingService.deleteMeeting(parentMeetingId, teacherId);
@@ -55,5 +59,4 @@ public class ParentMeetingController {
                 parentMeeting.getTopicsDiscussed());
     }
 }
-
 

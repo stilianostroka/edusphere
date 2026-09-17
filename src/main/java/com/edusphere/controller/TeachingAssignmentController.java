@@ -4,8 +4,10 @@ import com.edusphere.dto.TeachingAssignmentRequest;
 import com.edusphere.dto.TeachingAssignmentResponse;
 import com.edusphere.entity.TeachingAssignment;
 import com.edusphere.service.TeachingAssignmentService;
+import com.edusphere.security.CurrentUserProvider;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -14,17 +16,21 @@ import java.util.List;
 public class TeachingAssignmentController {
 
     private final TeachingAssignmentService teachingAssignmentService;
+    private final CurrentUserProvider currentUserProvider;
 
 
-    public TeachingAssignmentController(TeachingAssignmentService teachingAssignmentService){
+    public TeachingAssignmentController(TeachingAssignmentService teachingAssignmentService, CurrentUserProvider currentUserProvider){
         this.teachingAssignmentService = teachingAssignmentService;
+        this.currentUserProvider = currentUserProvider;
     }
 
     @GetMapping
     public ResponseEntity<List<TeachingAssignmentResponse>> getAll(@RequestParam(required = false) Long academicYearId) {
-        List<TeachingAssignment> assignments = academicYearId != null
-                ? teachingAssignmentService.getByAcademicYear(academicYearId)
-                : teachingAssignmentService.getAll();
+        List<TeachingAssignment> assignments = teachingAssignmentService.getAll();
+        if (academicYearId != null) {
+            assignments = assignments.stream()
+                    .filter(a -> a.getSchoolClass().getAcademicYear().getId().equals(academicYearId)).toList();
+        }
         return ResponseEntity.ok(assignments.stream().map(this::toResponse).toList());
     }
 
@@ -33,7 +39,15 @@ public class TeachingAssignmentController {
         return ResponseEntity.ok(teachingAssignmentService.getByTeacher(teacherId).stream().map(this::toResponse).toList());
     }
 
+    @GetMapping("/me")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<List<TeachingAssignmentResponse>> getMine(){
+        return ResponseEntity.ok(teachingAssignmentService.getByTeacher(currentUserProvider.getCurrentTeacherId())
+                .stream().map(this::toResponse).toList());
+    }
+
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<TeachingAssignmentResponse> create(@RequestBody TeachingAssignmentRequest request) {
         TeachingAssignment assignment = teachingAssignmentService.createAssignment(request.classId(),
                 request.teacherId(), request.subjectId());

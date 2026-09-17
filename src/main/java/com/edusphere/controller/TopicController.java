@@ -6,6 +6,7 @@ import com.edusphere.entity.Topic;
 import com.edusphere.service.TopicService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -42,6 +43,7 @@ public class TopicController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<TopicResponse> create(@RequestBody TopicRequest request) {
         Topic topic = topicService.createTopic(
                 request.teachingAssignmentId(), request.topicName(), request.description(), request.date()
@@ -50,12 +52,14 @@ public class TopicController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<TopicResponse> update(@PathVariable Long id, @RequestBody TopicRequest request) {
         topicService.updateTopic(id, request.topicName(), request.description(), request.date());
         return ResponseEntity.ok(toResponse(topicService.getById(id)));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         topicService.deleteTopic(id);
         return ResponseEntity.noContent().build();

@@ -10,6 +10,7 @@ import com.edusphere.security.CurrentUserProvider;
 import com.edusphere.service.LessonRecordService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -37,30 +38,35 @@ public class LessonRecordController {
     }
 
     @PostMapping("/grade")
+    @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<LessonRecordResponse> gradeStudent(@RequestBody LessonRecordRequest request) {
         LessonRecord record = lessonRecordService.gradeStudent(request.topicId(), request.studentId(), request.grade());
         return ResponseEntity.ok(toResponse(record));
     }
 
     @PostMapping("/absent")
+    @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<LessonRecordResponse> markStudentAbsent(@RequestBody MarkAbsentRequest request) {
         LessonRecord record = lessonRecordService.markStudentAbsent(request.topicId(), request.studentId());
         return ResponseEntity.ok(toResponse(record));
     }
 
     @PutMapping("/{id}/grade")
+    @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<LessonRecordResponse> updateGrade(@PathVariable Long id, @RequestBody UpdateGradeRequest request) {
         lessonRecordService.updateGrade(id, request.grade());
         return ResponseEntity.ok(toResponse(lessonRecordService.getById(id)));
     }
 
     @PutMapping("/{id}/mark-absent")
+    @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<LessonRecordResponse> markAbsent(@PathVariable Long id) {
         lessonRecordService.markAbsent(id);
         return ResponseEntity.ok(toResponse(lessonRecordService.getById(id)));
     }
 
     @PutMapping("/{id}/justify")
+    @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<LessonRecordResponse> justifyAbsence(@PathVariable Long id, @RequestBody JustifyAbsenceRequest request) {
         Long teacherId = currentUserProvider.getCurrentTeacherId();
         lessonRecordService.justifyAbsence(id, teacherId, request.note());

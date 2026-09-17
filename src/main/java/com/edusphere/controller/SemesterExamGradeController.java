@@ -6,6 +6,7 @@ import com.edusphere.entity.SemesterExamGrade;
 import com.edusphere.service.GradingService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class SemesterExamGradeController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<SemesterExamGradeResponse> record(@RequestBody ExamGradeRequest request) {
         SemesterExamGrade semesterExamGrade = gradingService.recordExamGrade(
                 request.teachingAssignmentId(), request.studentId(), request.gradingPeriodId(), request.examGrade()

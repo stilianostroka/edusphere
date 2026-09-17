@@ -3,6 +3,7 @@ package com.edusphere.dto;
 import java.util.List;
 
 public record ClassGradeRosterEntry(
+        Long finalGradeId,
         Long studentId,
         String studentFirstName,
         String studentLastName,
