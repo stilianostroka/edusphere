@@ -8,12 +8,14 @@ import {
 import { Icon } from '../components/Icon';
 import { GradeSelectorModal } from '../components/GradeSelectorModal';
 import { useMessage } from '../context/MessageContext';
+import { useAcademicYear } from '../context/AcademicYearContext';
 
 const EDIT_WINDOW_MS = 24 * 60 * 60 * 1000;
 const withinWindow = (createdAt: string) => Date.now() - new Date(createdAt).getTime() < EDIT_WINDOW_MS;
 
 export function RegistryPage() {
   const { showError } = useMessage();
+  const { selectedYearId } = useAcademicYear();
   const [searchParams, setSearchParams] = useSearchParams();
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [assignmentId, setAssignmentId] = useState(searchParams.get('assignmentId') ?? '');
@@ -25,11 +27,12 @@ export function RegistryPage() {
   const [gradingStudent, setGradingStudent] = useState<Student | null>(null);
 
   useEffect(() => {
-    void assignmentsApi.mine().then((a) => {
+    void assignmentsApi.mine(selectedYearId).then((a) => {
       setAssignments(a);
-      if (!assignmentId && a[0]) setAssignmentId(String(a[0].id));
+      if (!a.some((x) => String(x.id) === assignmentId)) setAssignmentId(a[0] ? String(a[0].id) : '');
     });
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedYearId]);
 
   const assignment = assignments.find((a) => a.id === Number(assignmentId));
 

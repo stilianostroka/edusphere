@@ -51,14 +51,14 @@ export const parentsApi = {
 };
 export const classesApi = {
   all: (academicYearId?:number|null) => client.get<SchoolClass[]>('/classes', {params: academicYearId ? {academicYearId} : {}}).then(r=>r.data),
-  supervised: () => client.get<SchoolClass>('/classes/supervised/me').then(r=>r.data)
+  supervised: (academicYearId?:number|null) => client.get<SchoolClass>('/classes/supervised/me', {params: academicYearId ? {academicYearId} : {}}).then(r=>r.data)
 };
 export const assignmentsApi = {
-  all: () => client.get<Assignment[]>('/teaching-assignments').then(r=>r.data),
-  mine: () => client.get<Assignment[]>('/teaching-assignments/me').then(r=>r.data)
+  all: (academicYearId?:number|null) => client.get<Assignment[]>('/teaching-assignments', {params: academicYearId ? {academicYearId} : {}}).then(r=>r.data),
+  mine: (academicYearId?:number|null) => client.get<Assignment[]>('/teaching-assignments/me', {params: academicYearId ? {academicYearId} : {}}).then(r=>r.data)
 };
 export const timetableApi = {
-  teacher: (teacherId:number) => client.get<TimetableSlot[]>(`/timetable/teacher/${teacherId}`).then(r=>r.data),
+  teacher: (teacherId:number, academicYearId?:number|null) => client.get<TimetableSlot[]>(`/timetable/teacher/${teacherId}`, {params: academicYearId ? {academicYearId} : {}}).then(r=>r.data),
   assignment: (assignmentId:number) => client.get<TimetableSlot[]>(`/timetable/teaching-assignment/${assignmentId}`).then(r=>r.data),
   create: (data:Record<string,unknown>) => client.post<TimetableSlot>('/timetable', data).then(r=>r.data),
   update: (id:number,data:Record<string,unknown>) => client.put<TimetableSlot>(`/timetable/${id}`,data).then(r=>r.data)

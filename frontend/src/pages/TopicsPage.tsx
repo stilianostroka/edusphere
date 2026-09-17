@@ -5,6 +5,7 @@ import { Icon } from '../components/Icon';
 import { FormModal, type FormModalField } from '../components/FormModal';
 import { ConfirmModal } from '../components/ConfirmModal';
 import { useMessage } from '../context/MessageContext';
+import { useAcademicYear } from '../context/AcademicYearContext';
 
 const EDIT_WINDOW_MS = 24 * 60 * 60 * 1000;
 const withinWindow = (createdAt: string) => Date.now() - new Date(createdAt).getTime() < EDIT_WINDOW_MS;
@@ -12,6 +13,7 @@ const withinWindow = (createdAt: string) => Date.now() - new Date(createdAt).get
 export function TopicsPage() {
   const { showError, showSuccess } = useMessage();
   const navigate = useNavigate();
+  const { selectedYearId } = useAcademicYear();
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [assignmentId, setAssignmentId] = useState('');
   const [topics, setTopics] = useState<Topic[]>([]);
@@ -20,8 +22,8 @@ export function TopicsPage() {
   const [deleting, setDeleting] = useState<Topic | null>(null);
 
   useEffect(() => {
-    void assignmentsApi.mine().then((a) => { setAssignments(a); if (a[0]) setAssignmentId(String(a[0].id)); });
-  }, []);
+    void assignmentsApi.mine(selectedYearId).then((a) => { setAssignments(a); setAssignmentId(a[0] ? String(a[0].id) : ''); });
+  }, [selectedYearId]);
 
   const load = async () => {
     if (!assignmentId) { setTopics([]); return; }

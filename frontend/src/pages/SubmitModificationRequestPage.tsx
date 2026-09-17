@@ -7,12 +7,14 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { Icon } from '../components/Icon';
 import { useMessage } from '../context/MessageContext';
+import { useAcademicYear } from '../context/AcademicYearContext';
 
 type RequestType = 'topic' | 'grade' | 'absence' | 'exam';
 
 export function SubmitModificationRequestPage() {
   const { user } = useAuth();
   const { showSuccess, showError } = useMessage();
+  const { selectedYearId } = useAcademicYear();
   const [type, setType] = useState<RequestType>('topic');
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [assignmentId, setAssignmentId] = useState('');
@@ -34,11 +36,12 @@ export function SubmitModificationRequestPage() {
   const currentRecord = records.find((r) => r.studentId === Number(studentId));
 
   const load = async () => {
-    const a = await assignmentsApi.mine();
+    const a = await assignmentsApi.mine(selectedYearId);
     setAssignments(a);
+    if (!a.some((x) => String(x.id) === assignmentId)) setAssignmentId('');
     if (user?.profileId) setHistory(await modificationsApi.mine(user.profileId));
   };
-  useEffect(() => { void load(); }, [user?.profileId]);
+  useEffect(() => { void load(); }, [user?.profileId, selectedYearId]);
 
   useEffect(() => {
     setTopicId(''); setStudentId(''); setRecords([]); setExamGrades([]); setExamGradeId('');

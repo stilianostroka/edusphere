@@ -6,11 +6,13 @@ import {
 import { Icon } from '../components/Icon';
 import { FormModal, type FormModalField } from '../components/FormModal';
 import { useMessage } from '../context/MessageContext';
+import { useAcademicYear } from '../context/AcademicYearContext';
 
 const STATUS_OPTIONS = ['ACTIVE', 'INACTIVE', 'GRADUATED', 'SUSPENDED', 'TRANSFERRED', 'WITHDRAWN'];
 
 export function SupervisedClassPage() {
   const { showError } = useMessage();
+  const { selectedYearId } = useAcademicYear();
   const [schoolClass, setClass] = useState<SchoolClass | null>(null);
   const [students, setStudents] = useState<Student[]>([]);
   const [meetings, setMeetings] = useState<Meeting[]>([]);
@@ -24,18 +26,19 @@ export function SupervisedClassPage() {
 
   const load = async () => {
     try {
-      const c = await classesApi.supervised();
+      const c = await classesApi.supervised(selectedYearId);
       setClass(c);
       const [s, m, f] = await Promise.all([studentsApi.byClass(c.id), meetingsApi.byClass(c.id), gradesApi.classRoster(c.id)]);
       setStudents(s.slice().sort((a, b) => `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`)));
       setMeetings(m); setFinalRoster(f);
       setUnauthorized(false);
     } catch {
+      setClass(null);
       setUnauthorized(true);
       showError('You are not assigned as supervisor of a class.');
     }
   };
-  useEffect(() => { void load(); }, []);
+  useEffect(() => { void load(); }, [selectedYearId]);
 
   const notifyFields: FormModalField[] = [{ key: 'message', label: 'Notification message', type: 'textarea' }];
   const submitNotify = async (values: Record<string, string>) => {

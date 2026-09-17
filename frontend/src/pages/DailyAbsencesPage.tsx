@@ -3,11 +3,13 @@ import { classesApi, lessonRecordsApi, studentsApi, topicsApi, type ClassAbsence
 import { Icon } from '../components/Icon';
 import { FormModal } from '../components/FormModal';
 import { useMessage } from '../context/MessageContext';
+import { useAcademicYear } from '../context/AcademicYearContext';
 
 const currentMonth = new Date().toISOString().slice(0, 7);
 
 export function DailyAbsencesPage() {
   const { showError } = useMessage();
+  const { selectedYearId } = useAcademicYear();
   const [month, setMonth] = useState(currentMonth);
   const [className, setClassName] = useState('');
   const [unauthorized, setUnauthorized] = useState(false);
@@ -18,18 +20,19 @@ export function DailyAbsencesPage() {
 
   const load = async () => {
     try {
-      const c = await classesApi.supervised();
+      const c = await classesApi.supervised(selectedYearId);
       setClassName(c.className);
       const [s, a] = await Promise.all([studentsApi.byClass(c.id), lessonRecordsApi.classAbsences(c.id)]);
       setStudents(s.slice().sort((x, y) => `${x.firstName} ${x.lastName}`.localeCompare(`${y.firstName} ${y.lastName}`)));
       setAbsences(a);
       setUnauthorized(false);
     } catch {
+      setStudents([]); setAbsences([]);
       setUnauthorized(true);
       showError('You do not supervise a class.');
     }
   };
-  useEffect(() => { void load(); }, []);
+  useEffect(() => { void load(); }, [selectedYearId]);
 
   const [year, monthNum] = month.split('-').map(Number);
   const daysInMonth = new Date(year, monthNum, 0).getDate();

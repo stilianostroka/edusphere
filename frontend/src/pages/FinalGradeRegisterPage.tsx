@@ -23,8 +23,8 @@ export function FinalGradeRegisterPage() {
   const [withdrawing, setWithdrawing] = useState<GradeRoster | null>(null);
 
   useEffect(() => {
-    void assignmentsApi.mine().then((a) => { setAssignments(a); if (a[0]) setAssignmentId(String(a[0].id)); });
-  }, []);
+    void assignmentsApi.mine(selectedYearId).then((a) => { setAssignments(a); setAssignmentId(a[0] ? String(a[0].id) : ''); });
+  }, [selectedYearId]);
   useEffect(() => { if (selectedYearId) void getGradingPeriods(selectedYearId).then((p) => {
     setPeriods(p); if (p[0]) { setExamPeriodId(String(p[0].id)); setCegPeriodId(String(p[0].id)); }
   }); }, [selectedYearId]);
