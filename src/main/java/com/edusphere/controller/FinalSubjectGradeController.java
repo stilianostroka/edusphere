@@ -94,6 +94,18 @@ public class FinalSubjectGradeController {
         return ResponseEntity.ok(gradingService.getAllSubmitted().stream().map(this::toResponse).toList());
     }
 
+    @DeleteMapping("/{id}/project-grade")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<FinalSubjectGradeResponse> clearProjectGrade(@PathVariable Long id) {
+        return ResponseEntity.ok(toResponse(gradingService.clearProjectGrade(id)));
+    }
+
+    @PostMapping("/{id}/withdraw")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<FinalSubjectGradeResponse> withdraw(@PathVariable Long id) {
+        return ResponseEntity.ok(toResponse(gradingService.withdrawFinalGrade(id)));
+    }
+
     @GetMapping("/class/{classId}")
     @PreAuthorize("hasAnyRole('ADMIN','TEACHER')")
     public ResponseEntity<List<SubjectClassRosterResponse>> getClassRosterAllSubjects(@PathVariable Long classId) {

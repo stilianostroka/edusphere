@@ -77,6 +77,20 @@ public class FinalSubjectGrade {
         this.projectGrade = projectGrade;
     }
 
+    public void clearProjectGrade() {
+        requireStatus(FinalGradeStatus.DRAFT, "Project grade can only be cleared while in DRAFT");
+        this.projectGrade = null;
+    }
+
+    public void withdraw() {
+        requireStatus(FinalGradeStatus.SUBMITTED, "Only a SUBMITTED grade can be withdrawn");
+        this.status = FinalGradeStatus.DRAFT;
+        this.submittedAt = null;
+        this.cceg = null;
+        this.cfe = null;
+        this.finalGrade = null;
+    }
+
     public void submit(Integer cceg, Integer cfe) {
         requireStatus(FinalGradeStatus.DRAFT, "Only a DRAFT grade can be submitted");
         if (projectGrade == null) {

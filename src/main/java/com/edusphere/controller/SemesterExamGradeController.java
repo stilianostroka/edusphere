@@ -29,6 +29,13 @@ public class SemesterExamGradeController {
         return ResponseEntity.ok(toResponse(semesterExamGrade));
     }
 
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        gradingService.deleteExamGrade(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/student/{studentId}/teaching-assignment/{teachingAssignmentId}")
     public ResponseEntity<List<SemesterExamGradeResponse>> getForStudentAndAssignment(
             @PathVariable Long studentId, @PathVariable Long teachingAssignmentId

@@ -195,11 +195,11 @@ public class GradingService  implements EditWindow{
             List<PeriodGradeSummary> periodSummaries = new ArrayList<>();
             for (GradingPeriod period : periods) {
                 double ceg = calculatePeriodCeg(teachingAssignment, period, student);
-                Integer examGrade = semesterExamGradeRepository
-                        .findByStudentAndGradingPeriodAndTeachingAssignment(student, period, teachingAssignment)
-                        .map(SemesterExamGrade::getExamGrade)
-                        .orElse(null);
-                periodSummaries.add(new PeriodGradeSummary(period.getSequenceNumber(), ceg, examGrade));
+                Optional<SemesterExamGrade> examGradeEntity = semesterExamGradeRepository
+                        .findByStudentAndGradingPeriodAndTeachingAssignment(student, period, teachingAssignment);
+                Integer examGrade = examGradeEntity.map(SemesterExamGrade::getExamGrade).orElse(null);
+                Long examGradeId = examGradeEntity.map(SemesterExamGrade::getId).orElse(null);
+                periodSummaries.add(new PeriodGradeSummary(period.getSequenceNumber(), ceg, examGrade, examGradeId));
             }
 
             Optional<FinalSubjectGrade> finalGrade = finalSubjectGradeRepository
@@ -223,5 +223,30 @@ public class GradingService  implements EditWindow{
 
     public List<FinalSubjectGrade> getAllSubmitted() {
         return finalSubjectGradeRepository.findAllByStatus(FinalGradeStatus.SUBMITTED);
+    }
+
+    public FinalSubjectGrade clearProjectGrade(Long finalSubjectGradeId) {
+        FinalSubjectGrade finalSubjectGrade = getFinalGradeById(finalSubjectGradeId);
+        finalSubjectGrade.clearProjectGrade();
+        finalSubjectGradeRepository.save(finalSubjectGrade);
+        return finalSubjectGrade;
+    }
+
+    public FinalSubjectGrade withdrawFinalGrade(Long finalSubjectGradeId) {
+        FinalSubjectGrade finalSubjectGrade = getFinalGradeById(finalSubjectGradeId);
+        finalSubjectGrade.withdraw();
+        finalSubjectGradeRepository.save(finalSubjectGrade);
+        return finalSubjectGrade;
+    }
+
+    public void deleteExamGrade(Long semesterExamGradeId) {
+        SemesterExamGrade semesterExamGrade = semesterExamGradeRepository.findById(semesterExamGradeId)
+                .orElseThrow(() -> new IllegalArgumentException("No exam grade found with id " + semesterExamGradeId));
+        if (!isWithinEditWindow(semesterExamGrade.getCreatedAt())) {
+            throw new IllegalStateException(
+                    "The 24-hour edit window has passed for this exam grade; submit a modification request instead"
+            );
+        }
+        semesterExamGradeRepository.delete(semesterExamGrade);
     }
 }
