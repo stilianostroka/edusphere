@@ -37,8 +37,13 @@ public class SchoolClassService {
         return schoolClassRepository.findByAcademicYear(academicYearService.getById(academicYearId));
     }
 
-    public SchoolClass getSupervisedBy(Long teacherId) {
+    public SchoolClass getSupervisedBy(Long teacherId, Long academicYearId) {
         Teacher teacher = teacherService.getById(teacherId);
+        if (academicYearId != null) {
+            AcademicYear academicYear = academicYearService.getById(academicYearId);
+            return schoolClassRepository.findByAcademicYearAndSupervisorTeacher(academicYear, teacher)
+                    .orElseThrow(() -> new IllegalArgumentException("This teacher does not supervise a class in this academic year"));
+        }
         return schoolClassRepository.findBySupervisorTeacher(teacher)
                 .orElseThrow(() -> new IllegalArgumentException("This teacher does not supervise a class"));
     }

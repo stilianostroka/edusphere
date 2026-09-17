@@ -34,8 +34,8 @@ public class SchoolClassController {
 
     @GetMapping("/supervised/me")
     @PreAuthorize("hasRole('TEACHER')")
-    public ResponseEntity<SchoolClassResponse> getMySupervisedClass() {
-        return ResponseEntity.ok(toResponse(schoolClassService.getSupervisedBy(currentUserProvider.getCurrentTeacherId())));
+    public ResponseEntity<SchoolClassResponse> getMySupervisedClass(@RequestParam(required = false) Long academicYearId) {
+        return ResponseEntity.ok(toResponse(schoolClassService.getSupervisedBy(currentUserProvider.getCurrentTeacherId(), academicYearId)));
     }
 
     @GetMapping("/{classId}")

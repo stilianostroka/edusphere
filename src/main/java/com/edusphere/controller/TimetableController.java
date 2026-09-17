@@ -52,10 +52,13 @@ public class TimetableController {
     }
 
     @GetMapping("/teacher/{teacherId}")
-    public ResponseEntity<List<TimetableSlotResponse>> getByTeacher(@PathVariable Long teacherId) {
-        return ResponseEntity.ok(
-                timetableService.getByTeacher(teacherId).stream().map(this::toResponse).toList()
-        );
+    public ResponseEntity<List<TimetableSlotResponse>> getByTeacher(@PathVariable Long teacherId, @RequestParam(required = false) Long academicYearId) {
+        List<TimetableSlot> slots = timetableService.getByTeacher(teacherId);
+        if (academicYearId != null) {
+            slots = slots.stream()
+                    .filter(s -> s.getTeachingAssignment().getSchoolClass().getAcademicYear().getId().equals(academicYearId)).toList();
+        }
+        return ResponseEntity.ok(slots.stream().map(this::toResponse).toList());
     }
 
     private TimetableSlotResponse toResponse(TimetableSlot slot) {

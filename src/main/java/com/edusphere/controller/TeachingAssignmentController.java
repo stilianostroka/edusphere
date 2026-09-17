@@ -41,9 +41,13 @@ public class TeachingAssignmentController {
 
     @GetMapping("/me")
     @PreAuthorize("hasRole('TEACHER')")
-    public ResponseEntity<List<TeachingAssignmentResponse>> getMine(){
-        return ResponseEntity.ok(teachingAssignmentService.getByTeacher(currentUserProvider.getCurrentTeacherId())
-                .stream().map(this::toResponse).toList());
+    public ResponseEntity<List<TeachingAssignmentResponse>> getMine(@RequestParam(required = false) Long academicYearId){
+        List<TeachingAssignment> assignments = teachingAssignmentService.getByTeacher(currentUserProvider.getCurrentTeacherId());
+        if (academicYearId != null) {
+            assignments = assignments.stream()
+                    .filter(a -> a.getSchoolClass().getAcademicYear().getId().equals(academicYearId)).toList();
+        }
+        return ResponseEntity.ok(assignments.stream().map(this::toResponse).toList());
     }
 
     @PostMapping
