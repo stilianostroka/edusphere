@@ -1,13 +1,19 @@
 package com.edusphere.controller;
 
+import com.edusphere.dto.ClassAbsenceEntry;
 import com.edusphere.dto.JustifyAbsenceRequest;
 import com.edusphere.dto.LessonRecordRequest;
 import com.edusphere.dto.LessonRecordResponse;
 import com.edusphere.dto.MarkAbsentRequest;
 import com.edusphere.dto.UpdateGradeRequest;
 import com.edusphere.entity.LessonRecord;
+import com.edusphere.entity.Role;
+import com.edusphere.entity.SchoolClass;
+import com.edusphere.entity.Teacher;
+import com.edusphere.entity.User;
 import com.edusphere.security.CurrentUserProvider;
 import com.edusphere.service.LessonRecordService;
+import com.edusphere.service.SchoolClassService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,11 +26,13 @@ public class LessonRecordController {
 
     private final LessonRecordService lessonRecordService;
     private final CurrentUserProvider currentUserProvider;
+    private final SchoolClassService schoolClassService;
 
-
-    public LessonRecordController(LessonRecordService lessonRecordService, CurrentUserProvider currentUserProvider) {
+    public LessonRecordController(LessonRecordService lessonRecordService, CurrentUserProvider currentUserProvider,
+                                   SchoolClassService schoolClassService) {
         this.lessonRecordService = lessonRecordService;
         this.currentUserProvider = currentUserProvider;
+        this.schoolClassService = schoolClassService;
     }
 
     @GetMapping("/topic/{topicId}")
@@ -35,6 +43,11 @@ public class LessonRecordController {
     @GetMapping("/student/{studentId}/absences")
     public ResponseEntity<List<LessonRecordResponse>> getStudentAbsences(@PathVariable Long studentId) {
         return ResponseEntity.ok(lessonRecordService.getByStudentAbsences(studentId).stream().map(this::toResponse).toList());
+    }
+
+    @GetMapping("/student/{studentId}/grades")
+    public ResponseEntity<List<LessonRecordResponse>> getStudentGrades(@PathVariable Long studentId) {
+        return ResponseEntity.ok(lessonRecordService.getByStudentGrades(studentId).stream().map(this::toResponse).toList());
     }
 
     @PostMapping("/grade")
@@ -73,17 +86,46 @@ public class LessonRecordController {
         return ResponseEntity.ok(toResponse(lessonRecordService.getById(id)));
     }
 
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<Void> deleteRecord(@PathVariable Long id) {
+        lessonRecordService.deleteRecord(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/class/{classId}/absences")
+    @PreAuthorize("hasAnyRole('ADMIN','TEACHER')")
+    public ResponseEntity<List<ClassAbsenceEntry>> getClassAbsences(@PathVariable Long classId) {
+        requireAdminOrSupervisor(classId);
+        return ResponseEntity.ok(lessonRecordService.getClassAbsences(classId));
+    }
+
+    private void requireAdminOrSupervisor(Long classId) {
+        User currentUser = currentUserProvider.getCurrentUser();
+        if (currentUser.getRole() == Role.ADMIN) return;
+        Teacher teacher = currentUserProvider.getCurrentTeacher();
+        SchoolClass schoolClass = schoolClassService.getById(classId);
+        if (schoolClass.getSupervisorTeacher() == null
+                || !schoolClass.getSupervisorTeacher().getId().equals(teacher.getId())) {
+            throw new IllegalArgumentException("Only the supervising teacher of this class (or an admin) can view this data.");
+        }
+    }
+
     private LessonRecordResponse toResponse(LessonRecord record) {
         return new LessonRecordResponse(
                 record.getId(),
                 record.getTopic().getId(),
+                record.getTopic().getName(),
+                record.getTopic().getTeachingAssignment().getSubject().getSubjectName(),
+                record.getTopic().getDate(),
                 record.getStudent().getId(),
                 record.getStudent().getFirstName(),
                 record.getStudent().getLastName(),
                 record.getGrade(),
                 record.isAbsent(),
                 record.isJustified(),
-                record.getJustificationNote()
+                record.getJustificationNote(),
+                record.getCreatedAt()
         );
     }
 }

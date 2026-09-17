@@ -43,6 +43,21 @@ public class SubjectController {
         return ResponseEntity.ok(toResponse(subject));
     }
 
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<SubjectResponse> update(@PathVariable Long id, @RequestBody SubjectRequest subjectRequest) {
+        Subject subject = subjectService.updateSubject(id, subjectRequest.subjectName(), subjectRequest.code(),
+                subjectRequest.totalHours(), subjectRequest.programYear());
+        return ResponseEntity.ok(toResponse(subject));
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        subjectService.deleteSubject(id);
+        return ResponseEntity.noContent().build();
+    }
+
     private SubjectResponse toResponse(Subject subject) {
         return new SubjectResponse(
                 subject.getId(), subject.getSubjectName(), subject.getCode(),

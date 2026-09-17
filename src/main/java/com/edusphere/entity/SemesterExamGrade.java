@@ -44,6 +44,7 @@ public class SemesterExamGrade {
         this.teachingAssignment = teachingAssignment;
         this.gradingPeriod = gradingPeriod;
         this.examGrade = examGrade;
+        this.createdAt = LocalDateTime.now();
     }
 
     private static void validateGrade(Integer grade) {

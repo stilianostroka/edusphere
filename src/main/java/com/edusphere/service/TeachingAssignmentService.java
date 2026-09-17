@@ -66,6 +66,11 @@ public class TeachingAssignmentService {
         long hoursTaught = calculateHoursTaught(teachingAssignment);
         return totalHours - hoursTaught;
     }
+
+    public List<TeachingAssignment> getBySchoolClass(Long schoolClassId) {
+        SchoolClass schoolClass = schoolClassService.getById(schoolClassId);
+        return teachingAssignmentRepository.findBySchoolClass(schoolClass);
+    }
 }
 
 

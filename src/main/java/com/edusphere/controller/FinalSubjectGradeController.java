@@ -3,9 +3,11 @@ package com.edusphere.controller;
 import com.edusphere.dto.ClassGradeRosterEntry;
 import com.edusphere.dto.FinalSubjectGradeResponse;
 import com.edusphere.dto.ProjectGradeRequest;
-import com.edusphere.entity.FinalSubjectGrade;
+import com.edusphere.dto.SubjectClassRosterResponse;
+import com.edusphere.entity.*;
 import com.edusphere.security.CurrentUserProvider;
 import com.edusphere.service.GradingService;
+import com.edusphere.service.SchoolClassService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,10 +20,12 @@ public class FinalSubjectGradeController {
 
     private final GradingService gradingService;
     private final CurrentUserProvider currentUserProvider;
+    private final SchoolClassService schoolClassService;
 
-    public FinalSubjectGradeController(GradingService gradingService, CurrentUserProvider currentUserProvider) {
+    public FinalSubjectGradeController(GradingService gradingService, CurrentUserProvider currentUserProvider, SchoolClassService schoolClassService) {
         this.gradingService = gradingService;
         this.currentUserProvider = currentUserProvider;
+        this.schoolClassService = schoolClassService;
     }
 
     @GetMapping("/roster/{teachingAssignmentId}")
@@ -84,6 +88,30 @@ public class FinalSubjectGradeController {
         return ResponseEntity.ok(toResponse(gradingService.rejectFinalGrade(id, adminUserId)));
     }
 
+    @GetMapping("/submitted")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<FinalSubjectGradeResponse>> getAllSubmitted() {
+        return ResponseEntity.ok(gradingService.getAllSubmitted().stream().map(this::toResponse).toList());
+    }
+
+    @GetMapping("/class/{classId}")
+    @PreAuthorize("hasAnyRole('ADMIN','TEACHER')")
+    public ResponseEntity<List<SubjectClassRosterResponse>> getClassRosterAllSubjects(@PathVariable Long classId) {
+        requireAdminOrSupervisor(classId);
+        return ResponseEntity.ok(gradingService.getClassRosterAllSubjects(classId));
+    }
+
+    private void requireAdminOrSupervisor(Long classId) {
+        User currentUser = currentUserProvider.getCurrentUser();
+        if (currentUser.getRole() == Role.ADMIN) return;
+        Teacher teacher = currentUserProvider.getCurrentTeacher();
+        SchoolClass schoolClass = schoolClassService.getById(classId);
+        if (schoolClass.getSupervisorTeacher() == null
+                || !schoolClass.getSupervisorTeacher().getId().equals(teacher.getId())) {
+            throw new IllegalArgumentException("Only the supervising teacher of this class (or an admin) can view this data.");
+        }
+    }
+
     private FinalSubjectGradeResponse toResponse(FinalSubjectGrade finalSubjectGrade) {
         return new FinalSubjectGradeResponse(
                 finalSubjectGrade.getId(),
@@ -101,11 +129,5 @@ public class FinalSubjectGradeController {
                 finalSubjectGrade.getSubmittedAt(),
                 finalSubjectGrade.getApprovedAt()
         );
-    }
-
-    @GetMapping("/submitted")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<FinalSubjectGradeResponse>> getAllSubmitted() {
-        return ResponseEntity.ok(gradingService.getAllSubmitted().stream().map(this::toResponse).toList());
     }
 }

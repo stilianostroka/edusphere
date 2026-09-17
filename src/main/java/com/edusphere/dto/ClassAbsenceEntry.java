@@ -3,17 +3,14 @@ package com.edusphere.dto;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public record LessonRecordResponse(
+public record ClassAbsenceEntry(
         Long id,
-        Long topicId,
-        String topicName,
-        String subjectName,
-        LocalDate date,
         Long studentId,
         String studentFirstName,
         String studentLastName,
-        Integer grade,
-        boolean absent,
+        String subjectName,
+        String topicName,
+        LocalDate date,
         boolean justified,
         String justificationNote,
         LocalDateTime createdAt

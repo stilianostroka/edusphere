@@ -2,6 +2,7 @@ package com.edusphere.service;
 
 import com.edusphere.dto.ClassGradeRosterEntry;
 import com.edusphere.dto.PeriodGradeSummary;
+import com.edusphere.dto.SubjectClassRosterResponse;
 import com.edusphere.entity.*;
 import com.edusphere.repository.FinalSubjectGradeRepository;
 import com.edusphere.repository.GradingPeriodRepository;
@@ -24,6 +25,7 @@ public class GradingService  implements EditWindow{
     private final StudentService studentService;
     private final TeachingAssignmentService teachingAssignmentService;
     private final UserService userService;
+    private final SchoolClassService schoolClassService;
 
     public GradingService(FinalSubjectGradeRepository finalSubjectGradeRepository,
                           SemesterExamGradeRepository semesterExamGradeRepository,
@@ -31,7 +33,8 @@ public class GradingService  implements EditWindow{
                           GradingPeriodRepository gradingPeriodRepository,
                           StudentService studentService,
                           TeachingAssignmentService teachingAssignmentService,
-                          UserService userService) {
+                          UserService userService,
+                          SchoolClassService schoolClassService) {
         this.finalSubjectGradeRepository = finalSubjectGradeRepository;
         this.semesterExamGradeRepository = semesterExamGradeRepository;
         this.lessonRecordRepository = lessonRecordRepository;
@@ -39,8 +42,23 @@ public class GradingService  implements EditWindow{
         this.studentService = studentService;
         this.teachingAssignmentService = teachingAssignmentService;
         this.userService = userService;
+        this.schoolClassService = schoolClassService;
     }
 
+    public List<SubjectClassRosterResponse> getClassRosterAllSubjects(Long classId) {
+        schoolClassService.getById(classId); // 404s early if the class doesn't exist
+        List<TeachingAssignment> assignments = teachingAssignmentService.getBySchoolClass(classId);
+        List<SubjectClassRosterResponse> result = new ArrayList<>();
+        for (TeachingAssignment ta : assignments) {
+            result.add(new SubjectClassRosterResponse(
+                    ta.getId(),
+                    ta.getSubject().getSubjectName(),
+                    ta.getTeacher().getFullName(),
+                    getClassRoster(ta.getId())
+            ));
+        }
+        return result;
+    }
     public java.util.List<SemesterExamGrade> getExamGrades(Long studentId, Long teachingAssignmentId) {
         Student student = studentService.getStudent(studentId);
         TeachingAssignment teachingAssignment = teachingAssignmentService.getById(teachingAssignmentId);

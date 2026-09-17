@@ -1,9 +1,6 @@
 package com.edusphere.repository;
 
-import com.edusphere.entity.LessonRecord;
-import com.edusphere.entity.Student;
-import com.edusphere.entity.TeachingAssignment;
-import com.edusphere.entity.Topic;
+import com.edusphere.entity.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
@@ -23,6 +20,8 @@ public interface LessonRecordRepository extends JpaRepository<LessonRecord, Long
     long countByStudentAndAbsentTrue(Student student);
     Optional<LessonRecord> findByStudentAndTopic(Student student, Topic topic);
     List<LessonRecord> findByStudentAndAbsentTrueAndJustifiedFalse(Student student);
+    List<LessonRecord> findByStudent_SchoolClassAndAbsentTrue(SchoolClass schoolClass);
+    List<LessonRecord> findByStudentAndGradeIsNotNull(Student student);
 }
 
 

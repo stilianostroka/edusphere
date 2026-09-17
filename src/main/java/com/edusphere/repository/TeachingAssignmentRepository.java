@@ -13,4 +13,5 @@ public interface TeachingAssignmentRepository extends JpaRepository<TeachingAssi
     List<TeachingAssignment> findBySchoolClass(SchoolClass schoolClass);
     List<TeachingAssignment> findByTeacher(Teacher teacher);
     List<TeachingAssignment> findBySchoolClass_AcademicYear(AcademicYear academicYear);
+    boolean existsBySubject(Subject subject);
 }

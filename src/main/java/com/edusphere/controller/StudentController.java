@@ -35,8 +35,8 @@ public class StudentController {
     @GetMapping
     public ResponseEntity<List<StudentResponse>> getAll(@RequestParam(required = false) Long academicYearId) {
         return ResponseEntity.ok(studentService.getAll().stream()
-                .filter(student -> academicYearId == null || (student.getSchoolClass() != null
-                        && student.getSchoolClass().getAcademicYear().getId().equals(academicYearId)))
+                .filter(student -> academicYearId == null || student.getSchoolClass() == null
+                        || student.getSchoolClass().getAcademicYear().getId().equals(academicYearId))
                 .map(this::toResponse).toList());
     }
 
