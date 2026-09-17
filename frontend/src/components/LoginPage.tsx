@@ -2,13 +2,16 @@ import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useMessage } from '../context/MessageContext';
+import { forgotPassword } from '../api/auth';
+import { FormModal } from './FormModal';
 
 export function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [showForgot, setShowForgot] = useState(false);
   const { login } = useAuth();
-  const { showError } = useMessage();
+  const { showError, showSuccess } = useMessage();
   const navigate = useNavigate();
 
   async function handleSubmit(event: FormEvent) {
@@ -21,6 +24,16 @@ export function LoginPage() {
       showError('Email or password is incorrect.');
     } finally {
       setSubmitting(false);
+    }
+  }
+
+  async function handleForgotPassword(values: Record<string, string>) {
+    setShowForgot(false);
+    try {
+      await forgotPassword(values.email);
+      showSuccess('If an account exists for that email, a reset link has been sent.');
+    } catch {
+      showError('Could not send the reset email. Please try again later.');
     }
   }
 
@@ -67,7 +80,7 @@ export function LoginPage() {
               <label style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <input type="checkbox" /> Remember me
               </label>
-              <a href="#">Forgot password?</a>
+              <a href="#" onClick={(e) => { e.preventDefault(); setShowForgot(true); }}>Forgot password?</a>
             </div>
             <button type="submit" className="btn-primary" style={{ width: '100%' }} disabled={submitting}>
               {submitting ? 'Signing in…' : 'Sign in'}
@@ -77,6 +90,17 @@ export function LoginPage() {
 
         <p className="login-footnote">© 2026 EduSphere · Privacy · Terms</p>
       </div>
+
+      {showForgot && (
+        <FormModal
+          title="Forgot password"
+          subtitle="Enter your account email and we'll send you a link to reset your password."
+          fields={[{ key: 'email', label: 'Email', type: 'text', placeholder: 'you@edusphere.com' }]}
+          submitLabel="Send reset link"
+          onSubmit={handleForgotPassword}
+          onCancel={() => setShowForgot(false)}
+        />
+      )}
     </div>
   );
 }

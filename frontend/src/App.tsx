@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { AcademicYearProvider } from './context/AcademicYearContext';
 import { MessageProvider } from './context/MessageContext';
 import { LoginPage } from './components/LoginPage';
+import { ResetPasswordPage } from './pages/ResetPasswordPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { RoleHomePage } from './pages/RoleHomePage';
 import { AcademicYearsPage } from './pages/AcademicYearsPage';
@@ -40,6 +41,7 @@ export default function App() {
         <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/" element={<ProtectedRoute><RoleHomePage /></ProtectedRoute>} />
 
           {/* Admin */}
