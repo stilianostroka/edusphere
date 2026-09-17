@@ -33,7 +33,15 @@ build/
 ### VS Code ###
 .vscode/
 
-### Frontend (frontend/) ###
+# Frontend
 frontend/node_modules/
 frontend/dist/
+frontend/.env
+frontend/.env.local
+
+# Backend
+backend/target/
+backend/.env
+
+# macOS
 .DS_Store
