@@ -57,7 +57,7 @@ Set these environment variables before starting:
 | `JWT_SECRET` | Signing key for auth tokens |
 | `MAIL_USERNAME` | Gmail address used to send password-reset emails |
 | `MAIL_PASSWORD` | Gmail **app password** (not your account password — regular passwords are rejected by Gmail's SMTP) |
-| `FRONTEND_URL` | Optional, defaults to `http://localhost:5173`. Used to build the reset-password link in emails. |
+| `FRONTEND_URL` | Optional, defaults to `http://localhost:5174`. Used to build the reset-password link in emails. |
 
 ```bash
 cd backend
